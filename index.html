@@ -146,15 +146,18 @@
         }
 
         .activity-badge.hot {
-            background: #F45D48;
+            background: #E8D8D6;
+            color: #7d5850;
         }
 
         .activity-badge.warm {
-            background: #FFA726;
+            background: #EBE5D9;
+            color: #6b5d47;
         }
 
         .activity-badge.cool {
-            background: rgba(255, 255, 255, 0.3);
+            background: #D5E5D5;
+            color: #3d5a45;
         }
 
         .state-content {
@@ -196,7 +199,7 @@
 
         .item-card {
             background: #FAFBFC;
-            border-left: 4px solid #F45D48;
+            border-left: 4px solid #c9a79e;
             padding: 20px;
             margin-bottom: 15px;
             border-radius: 8px;
@@ -208,6 +211,21 @@
             transform: translateX(5px);
             box-shadow: 0 2px 8px rgba(25, 37, 50, 0.1);
             border-left-color: #0A8080;
+        }
+
+        .item-card[data-priority="high"] {
+            background: #F2EFEF;
+            border-left-color: #c9a79e;
+        }
+
+        .item-card[data-priority="medium"] {
+            background: #F5F3EF;
+            border-left-color: #d4c4a8;
+        }
+
+        .item-card[data-priority="low"] {
+            background: #F0F5F0;
+            border-left-color: #a8c5b5;
         }
 
         .item-title {
@@ -356,13 +374,15 @@
         }
 
         .reminder-badge.email-reminder {
-            background: #FFA726;
-            color: white;
+            background: #EBE5D9;
+            color: #6b5d47;
+            border: 1px solid #d4c4a8;
         }
 
         .reminder-badge.slack-reminder {
-            background: #4A154B;
-            color: white;
+            background: #E8D8D6;
+            color: #7d5850;
+            border: 1px solid #c9a79e;
         }
 
         @keyframes pulse-reminder {
