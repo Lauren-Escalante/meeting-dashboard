@@ -3,12 +3,16 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Meeting Facilitator Dashboard</title>
+    <title>Meeting Facilitator Dashboard - By State</title>
     <style>
         * {
             margin: 0;
             padding: 0;
             box-sizing: border-box;
+        }
+
+        html {
+            scroll-behavior: smooth;
         }
 
         body {
@@ -88,339 +92,534 @@
             padding: 40px;
         }
 
-        .section {
-            margin-bottom: 50px;
+        .states-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(450px, 1fr));
+            gap: 30px;
+            margin-bottom: 30px;
         }
 
-        .section-title {
+        .state-section {
+            border: 2px solid #E5E8EB;
+            border-radius: 16px;
+            overflow: hidden;
+            background: white;
+            height: fit-content;
+        }
+
+        .state-header {
+            background: linear-gradient(135deg, #0A8080 0%, #0D9999 100%);
+            color: white;
+            padding: 25px 30px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .state-title {
             font-size: 1.8em;
-            color: #0A8080;
-            margin-bottom: 20px;
-            padding-bottom: 10px;
-            border-bottom: 3px solid #0A8080;
             font-weight: 600;
         }
 
-        .calendar-grid {
-            display: grid;
-            gap: 20px;
+        .activity-badges {
+            display: flex;
+            gap: 15px;
         }
 
-        .calendar-event {
-            background: linear-gradient(135deg, #0A8080 0%, #0D9999 100%);
+        .activity-badge {
+            background: rgba(255, 255, 255, 0.2);
+            padding: 8px 16px;
+            border-radius: 20px;
+            font-size: 0.9em;
+            font-weight: 600;
+            backdrop-filter: blur(10px);
+            cursor: pointer;
+            text-decoration: none;
             color: white;
-            padding: 25px;
-            border-radius: 12px;
-            box-shadow: 0 2px 8px rgba(10, 128, 128, 0.2);
+            display: inline-block;
             transition: all 0.2s;
         }
 
-        .calendar-event:hover {
-            transform: translateY(-3px);
-            box-shadow: 0 4px 16px rgba(10, 128, 128, 0.3);
+        .activity-badge:hover {
+            background: rgba(255, 255, 255, 0.35);
+            transform: translateY(-2px);
         }
 
-        .event-title {
-            font-size: 1.4em;
-            font-weight: 700;
+        .activity-badge.hot {
+            background: #F45D48;
+        }
+
+        .activity-badge.warm {
+            background: #FFA726;
+        }
+
+        .activity-badge.cool {
+            background: rgba(255, 255, 255, 0.3);
+        }
+
+        .state-content {
+            padding: 30px;
+            max-height: 600px;
+            overflow-y: auto;
+        }
+
+        .state-content::-webkit-scrollbar {
+            width: 8px;
+        }
+
+        .state-content::-webkit-scrollbar-track {
+            background: #FAFBFC;
+        }
+
+        .state-content::-webkit-scrollbar-thumb {
+            background: #C4CDD5;
+            border-radius: 4px;
+        }
+
+        .state-content::-webkit-scrollbar-thumb:hover {
+            background: #0A8080;
+        }
+
+        .subsection {
+            margin-bottom: 30px;
+        }
+
+        .subsection-title {
+            font-size: 1.3em;
+            color: #0A8080;
             margin-bottom: 15px;
-        }
-
-        .event-details {
-            display: grid;
-            gap: 10px;
-            opacity: 0.95;
-        }
-
-        .event-detail {
+            font-weight: 600;
             display: flex;
             align-items: center;
             gap: 10px;
         }
 
-        .event-link {
-            display: inline-block;
-            margin-top: 15px;
-            padding: 8px 16px;
-            background: rgba(255,255,255,0.2);
-            color: white;
-            text-decoration: none;
-            border-radius: 6px;
-            font-size: 0.9em;
-            transition: background 0.2s;
-        }
-
-        .event-link:hover {
-            background: rgba(255,255,255,0.3);
-        }
-
-        .meetings-grid {
-            display: grid;
-            gap: 20px;
-        }
-
-        .meeting-card {
-            background: white;
-            border-radius: 12px;
-            padding: 25px;
-            box-shadow: 0 2px 8px rgba(25, 37, 50, 0.06);
-            border-top: 4px solid #F45D48;
+        .item-card {
+            background: #FAFBFC;
+            border-left: 4px solid #F45D48;
+            padding: 20px;
+            margin-bottom: 15px;
+            border-radius: 8px;
             border: 1px solid #E5E8EB;
             transition: all 0.2s;
         }
 
-        .meeting-card:hover {
-            box-shadow: 0 4px 16px rgba(25, 37, 50, 0.12);
-            transform: translateY(-3px);
-            border-color: #F45D48;
+        .item-card:hover {
+            transform: translateX(5px);
+            box-shadow: 0 2px 8px rgba(25, 37, 50, 0.1);
+            border-left-color: #0A8080;
         }
 
-        .meeting-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: start;
-            margin-bottom: 15px;
-        }
-
-        .meeting-title {
-            font-size: 1.3em;
+        .item-title {
             font-weight: 600;
-            color: #333;
-            margin-bottom: 5px;
+            font-size: 1.1em;
+            color: #192532;
+            margin-bottom: 8px;
         }
 
-        .meeting-date {
-            background: #F45D48;
-            color: white;
-            padding: 6px 12px;
-            border-radius: 6px;
-            font-size: 0.85em;
-            font-weight: 500;
-            white-space: nowrap;
-        }
-
-        .meeting-details {
-            display: grid;
-            gap: 10px;
-            margin-top: 15px;
-        }
-
-        .meeting-detail {
+        .item-meta {
             display: flex;
-            gap: 10px;
-            font-size: 0.95em;
-        }
-
-        .detail-label {
-            font-weight: 600;
-            color: #F45D48;
-            min-width: 100px;
-        }
-
-        .detail-value {
+            gap: 15px;
+            font-size: 0.9em;
             color: #6B7785;
+            flex-wrap: wrap;
         }
 
-        .meeting-link {
+        .item-link {
             display: inline-block;
-            margin-top: 15px;
-            padding: 8px 16px;
+            margin-top: 10px;
+            padding: 6px 14px;
             background: #F45D48;
             color: white;
             text-decoration: none;
             border-radius: 6px;
-            font-size: 0.9em;
+            font-size: 0.85em;
             font-weight: 500;
             transition: all 0.2s;
-            margin-right: 10px;
         }
 
-        .meeting-link:hover {
+        .item-link:hover {
             background: #E24A38;
             transform: translateY(-1px);
             box-shadow: 0 2px 8px rgba(244, 93, 72, 0.3);
         }
 
-        .category-tag {
-            display: inline-block;
-            padding: 4px 10px;
-            background: #FAFBFC;
+        .empty-state {
+            text-align: center;
+            padding: 40px;
             color: #6B7785;
-            border-radius: 4px;
-            font-size: 0.85em;
-            font-weight: 500;
-            margin-right: 8px;
-            margin-top: 8px;
-            border: 1px solid #E5E8EB;
+            font-style: italic;
         }
 
-        .todo-grid {
-            display: grid;
-            gap: 15px;
+        .nprc-section {
+            background: linear-gradient(135deg, rgba(10, 128, 128, 0.05) 0%, rgba(13, 153, 153, 0.05) 100%);
+            border: 2px solid #0A8080;
         }
 
-        .todo-item {
-            background: #fff;
+        .nprc-section .state-header {
+            background: linear-gradient(135deg, #0A8080 0%, #0D9999 100%);
+        }
+
+        .nprc-section .state-content {
+            max-height: none;
+            overflow-y: visible;
+        }
+
+        @media (max-width: 1200px) {
+            .states-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .instruction-card {
+            background: linear-gradient(135deg, rgba(10, 128, 128, 0.03) 0%, rgba(10, 128, 128, 0.06) 100%);
             border-left: 4px solid #0A8080;
             padding: 20px;
+            margin-bottom: 15px;
             border-radius: 8px;
-            box-shadow: 0 2px 8px rgba(25, 37, 50, 0.06);
-            border: 1px solid #E5E8EB;
-            transition: all 0.2s;
-            cursor: pointer;
+            border: 1px solid #0A8080;
         }
 
-        .todo-item:hover {
-            box-shadow: 0 4px 16px rgba(25, 37, 50, 0.12);
-            transform: translateX(5px);
-        }
-
-        .todo-item.high {
-            border-left-color: #dc3545;
-            background: #fff5f5;
-        }
-
-        .todo-item.medium {
-            border-left-color: #ffc107;
-            background: #fffef5;
-        }
-
-        .todo-header {
+        .instruction-header {
             display: flex;
             justify-content: space-between;
             align-items: center;
+            cursor: pointer;
             margin-bottom: 10px;
         }
 
-        .todo-title {
+        .instruction-title {
             font-weight: 600;
-            font-size: 1.1em;
-            color: #333;
-        }
-
-        .priority-badge {
-            padding: 4px 12px;
-            border-radius: 20px;
-            font-size: 0.85em;
-            font-weight: 600;
-            text-transform: uppercase;
-        }
-
-        .priority-badge.high {
-            background: #dc3545;
-            color: white;
-        }
-
-        .priority-badge.medium {
-            background: #ffc107;
-            color: #333;
-        }
-
-        .todo-meta {
+            font-size: 1.05em;
+            color: #0A8080;
             display: flex;
-            gap: 20px;
-            font-size: 0.9em;
-            color: #666;
-            margin-top: 10px;
+            align-items: center;
+            gap: 8px;
         }
 
-        .todo-details {
+        .instruction-content {
+            background: white;
+            padding: 15px;
+            border-radius: 6px;
+            margin-top: 10px;
+            font-family: 'Monaco', 'Courier New', monospace;
+            font-size: 0.9em;
+            line-height: 1.6;
+            color: #192532;
+            white-space: pre-wrap;
             max-height: 0;
             overflow: hidden;
             transition: max-height 0.3s ease;
-            margin-top: 15px;
-            padding-top: 15px;
-            border-top: 1px solid #e9ecef;
         }
 
-        .todo-details.expanded {
+        .instruction-content.expanded {
             max-height: 500px;
+            overflow-y: auto;
         }
 
-        .todo-actions {
-            display: flex;
-            gap: 10px;
-            margin-top: 15px;
-            align-items: center;
-        }
-
-        .status-select {
+        .copy-btn {
+            background: #0A8080;
+            color: white;
+            border: none;
             padding: 6px 12px;
-            border: 2px solid #0A8080;
-            border-radius: 6px;
-            background: white;
-            color: #0A8080;
-            font-weight: 600;
+            border-radius: 4px;
+            font-size: 0.85em;
             cursor: pointer;
-            font-size: 0.9em;
             transition: all 0.2s;
         }
 
-        .status-select:hover {
-            background: #F0FAFA;
-            border-color: #0D9999;
+        .copy-btn:hover {
+            background: #0D9999;
+            transform: translateY(-1px);
         }
 
-        .complete-btn {
-            padding: 6px 16px;
-            background: #28a745;
+        .copy-btn.copied {
+            background: #4CAF50;
+        }
+
+        .toggle-icon {
+            transition: transform 0.3s ease;
+        }
+
+        .toggle-icon.rotated {
+            transform: rotate(180deg);
+        }
+
+        .reminder-badge {
+            display: inline-block;
+            padding: 4px 10px;
+            border-radius: 12px;
+            font-size: 0.75em;
+            font-weight: 600;
+            margin-left: 8px;
+            animation: pulse-reminder 2s infinite;
+        }
+
+        .reminder-badge.email-reminder {
+            background: #FFA726;
             color: white;
-            border: none;
-            border-radius: 6px;
-            cursor: pointer;
+        }
+
+        .reminder-badge.slack-reminder {
+            background: #4A154B;
+            color: white;
+        }
+
+        @keyframes pulse-reminder {
+            0%, 100% {
+                opacity: 1;
+                transform: scale(1);
+            }
+            50% {
+                opacity: 0.8;
+                transform: scale(1.05);
+            }
+        }
+
+        .metrics-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 15px;
+            background: white;
+        }
+
+        .metrics-table th {
+            background: linear-gradient(135deg, #0A8080 0%, #0D9999 100%);
+            color: white;
+            padding: 12px;
+            text-align: left;
             font-weight: 600;
             font-size: 0.9em;
-            transition: background 0.2s;
         }
 
-        .complete-btn:hover {
-            background: #218838;
+        .metrics-table td {
+            padding: 12px;
+            border-bottom: 1px solid #E5E8EB;
+            font-size: 0.95em;
         }
 
-        .expand-icon {
-            cursor: pointer;
-            user-select: none;
-            font-size: 1.2em;
+        .metrics-table tr:hover {
+            background: #FAFBFC;
+        }
+
+        .metrics-table .state-col {
+            font-weight: 600;
+            color: #192532;
+        }
+
+        .metrics-table .rate-col {
             color: #0A8080;
-            transition: transform 0.2s;
+            font-weight: 600;
         }
 
-        .expand-icon.expanded {
-            transform: rotate(90deg);
-        }
-
-        .todo-item.completed {
-            opacity: 0.6;
-            background: #FAFBFC !important;
-            border-left-color: #C4CDD5;
-        }
-
-        .todo-item.completed .todo-title {
-            text-decoration: line-through;
+        .metrics-table .count-col {
             color: #6B7785;
         }
 
-        .status-badge {
-            padding: 4px 12px;
-            border-radius: 20px;
+        @keyframes pulse {
+            0%, 100% {
+                opacity: 1;
+            }
+            50% {
+                opacity: 0.5;
+            }
+        }
+
+        .refresh-button {
+            background: rgba(255, 255, 255, 0.2);
+            color: white;
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            padding: 6px 12px;
+            border-radius: 6px;
             font-size: 0.85em;
+            cursor: pointer;
+            margin-left: 10px;
+            transition: all 0.2s;
+        }
+
+        .refresh-button:hover {
+            background: rgba(255, 255, 255, 0.3);
+            transform: translateY(-1px);
+        }
+
+        .refresh-button.refreshing {
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        /* Tab Navigation */
+        .tab-navigation {
+            display: flex;
+            gap: 0;
+            background: #FAFBFC;
+            padding: 0 40px;
+            border-bottom: 2px solid #E5E8EB;
+            overflow-x: auto;
+        }
+
+        .tab-button {
+            padding: 18px 28px;
+            background: none;
+            border: none;
+            color: #6B7785;
+            font-size: 0.95em;
             font-weight: 600;
+            cursor: pointer;
+            border-bottom: 3px solid transparent;
+            transition: all 0.2s;
+            white-space: nowrap;
+            position: relative;
+        }
+
+        .tab-button:hover {
+            color: #192532;
+            background: rgba(10, 128, 128, 0.05);
+        }
+
+        .tab-button.active {
+            color: #0A8080;
+            border-bottom-color: #0A8080;
+            background: white;
+        }
+
+        .tab-button .badge {
+            display: inline-block;
+            background: #F45D48;
+            color: white;
+            padding: 2px 6px;
+            border-radius: 10px;
+            font-size: 0.75em;
+            margin-left: 6px;
+            min-width: 18px;
+            text-align: center;
+        }
+
+        .tab-content {
+            display: none;
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        /* Collapsible State Sections */
+        .state-section {
+            margin-bottom: 20px;
+        }
+
+        .state-header {
+            cursor: pointer;
+            user-select: none;
+        }
+
+        .state-content {
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.3s ease, padding 0.3s ease;
+            padding: 0 30px;
+        }
+
+        .state-content.expanded {
+            max-height: 2000px;
+            padding: 30px;
+        }
+
+        .collapse-icon {
+            transition: transform 0.3s ease;
+            font-size: 0.8em;
             margin-left: 10px;
         }
 
-        .status-badge.todo {
-            background: #ffc107;
-            color: #333;
+        .collapse-icon.rotated {
+            transform: rotate(180deg);
         }
 
-        .status-badge.in-progress {
-            background: #17a2b8;
-            color: white;
+        /* Checkbox Items */
+        .checkbox-item {
+            display: flex;
+            align-items: flex-start;
+            gap: 12px;
+            transition: opacity 0.3s ease;
         }
 
-        .status-badge.done {
-            background: #28a745;
+        .checkbox-item.checked {
+            opacity: 0.4;
+            text-decoration: line-through;
+        }
+
+        .checkbox-item input[type="checkbox"] {
+            margin-top: 4px;
+            width: 18px;
+            height: 18px;
+            cursor: pointer;
+            accent-color: #0A8080;
+        }
+
+        .checkbox-content {
+            flex: 1;
+        }
+
+        /* Quick Stats Cards */
+        .quick-stats {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+            gap: 15px;
+            margin-bottom: 25px;
+        }
+
+        .quick-stat {
+            background: linear-gradient(135deg, #0A8080 0%, #0D9999 100%);
             color: white;
+            padding: 15px;
+            border-radius: 10px;
+            text-align: center;
+        }
+
+        .quick-stat-number {
+            font-size: 2em;
+            font-weight: 600;
+            display: block;
+        }
+
+        .quick-stat-label {
+            font-size: 0.85em;
+            opacity: 0.9;
+            margin-top: 5px;
+        }
+
+        /* Filter Controls */
+        .filter-bar {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+            align-items: center;
+        }
+
+        .filter-button {
+            padding: 8px 16px;
+            background: white;
+            border: 1px solid #E5E8EB;
+            border-radius: 6px;
+            color: #6B7785;
+            font-size: 0.9em;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .filter-button:hover {
+            border-color: #0A8080;
+            color: #0A8080;
+        }
+
+        .filter-button.active {
+            background: #0A8080;
+            color: white;
+            border-color: #0A8080;
         }
 
         @media (max-width: 768px) {
@@ -431,6 +630,25 @@
             .stats-grid {
                 grid-template-columns: repeat(2, 1fr);
             }
+
+            .state-header {
+                flex-direction: column;
+                gap: 15px;
+                align-items: flex-start;
+            }
+
+            .states-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .tab-navigation {
+                padding: 0 20px;
+            }
+
+            .tab-button {
+                padding: 15px 20px;
+                font-size: 0.85em;
+            }
         }
     </style>
 </head>
@@ -438,655 +656,1317 @@
     <div class="container">
         <header>
             <h1>Meeting Facilitator Dashboard</h1>
-            <p>Last Updated: March 23, 2026</p>
+            <p>Organized by State Activity</p>
+            <div style="margin-top: 15px; padding: 12px 20px; background: rgba(255, 255, 255, 0.15); border-radius: 8px; display: inline-block;">
+                <div style="font-size: 0.9em; opacity: 0.9; margin-bottom: 8px;">
+                    Current Time: <strong id="live-clock">Loading...</strong>
+                </div>
+                <div style="font-size: 0.85em; opacity: 0.85; margin-bottom: 8px;">
+                    Last Refreshed: <strong id="last-updated">Just now</strong>
+                </div>
+                <div style="font-size: 0.85em; margin-top: 5px; opacity: 0.85;">
+                    <span id="status-indicator" style="display: inline-block; width: 8px; height: 8px; background: #4CAF50; border-radius: 50%; margin-right: 5px; animation: pulse 2s infinite;"></span>
+                    Live Dashboard • Auto-updates every <strong id="refresh-interval">5</strong> minutes
+                </div>
+            </div>
         </header>
 
-        <div class="stats-grid">
-            <div class="stat-card">
-                <span class="stat-number">4</span>
-                <div class="stat-label">Upcoming Meetings</div>
-            </div>
-            <div class="stat-card">
-                <span class="stat-number">17</span>
-                <div class="stat-label">Past Meeting Notes</div>
-            </div>
-            <div class="stat-card">
-                <span class="stat-number">14</span>
-                <div class="stat-label">States Tracked</div>
-            </div>
-            <div class="stat-card">
-                <span class="stat-number">6</span>
-                <div class="stat-label">Action Items</div>
-            </div>
+        <!-- Tab Navigation -->
+        <div class="tab-navigation">
+            <button class="tab-button active" onclick="switchTab('overview')">
+                📊 Overview
+            </button>
+            <button class="tab-button" onclick="switchTab('reminders')" id="reminders-tab">
+                ⏰ Reminders <span class="badge" id="reminders-count">0</span>
+            </button>
+            <button class="tab-button" onclick="switchTab('states')">
+                🗺️ States
+            </button>
+            <button class="tab-button" onclick="switchTab('actions')" id="actions-tab">
+                ✓ Action Items <span class="badge" id="actions-count">6</span>
+            </button>
+            <button class="tab-button" onclick="switchTab('metrics')">
+                📈 Metrics
+            </button>
         </div>
 
         <div class="content">
-            <!-- Upcoming Meetings from Calendar -->
-            <div class="section">
-                <h2 class="section-title">Upcoming Meetings</h2>
-                <div class="calendar-grid">
-<div class="calendar-event" style="display:none;">
-                        <div class="event-title">Nevada + Gusto Quarterly Sync</div>
-                        <div class="event-details">
-                            <div class="event-detail">📅 March 16, 2026 at 1:00 PM - 1:30 PM EST</div>
-                            <div class="event-detail">👥 Esther Ou, Lauren, Nevada DETR team</div>
-                            <div class="event-detail">📍 Zoom + DEN-2-T3F6-14 Day Spa</div>
-                        </div>
-                        <a href="https://www.google.com/calendar/event?eid=ZTRham5wOW05cWRwZWFucTJsZDg1N2dpMzNfMjAyNjAzMTZUMTgwMDAwWiBsYXVyZW4uZXNjYWxhbnRlQGd1c3RvLmNvbQ" target="_blank" class="event-link">View in Calendar</a>
-                        <a href="https://docs.google.com/document/d/19PfQxBxGeQnBnf7dF0-q0K93p8PZkSDaSSLPhT3Melc/edit" target="_blank" class="event-link">Meeting Notes Doc</a>
-                    </div>
 
-<div class="calendar-event">
-                        <div class="event-title">NV SUI Filing Success Rate Focus Discussion</div>
-                        <div class="event-details">
-                            <div class="event-detail">📅 March 26, 2026 at 9:00 AM - 10:00 AM EST</div>
-                            <div class="event-detail">👥 Lauren, Jay Hoerr, Esther Ou</div>
-                            <div class="event-detail">💡 Post Agency Meeting Follow-up</div>
-                        </div>
-                        <a href="https://www.google.com/calendar/event?eid=NHFzOGZ0aTBla25yOTQycTRwY2VlMzBlMzAgbGF1cmVuLmVzY2FsYW50ZUBndXN0by5jb20" target="_blank" class="event-link">View in Calendar</a>
+            <!-- Overview Tab -->
+            <div id="overview-tab" class="tab-content active">
+                <div class="stats-grid">
+                    <div class="stat-card">
+                        <span class="stat-number">14</span>
+                        <div class="stat-label">States Tracked</div>
                     </div>
-
-<div class="calendar-event">
-                        <div class="event-title">NAPEO State Government Affairs Committee</div>
-                        <div class="event-details">
-                            <div class="event-detail">📅 March 26, 2026 at 2:00 PM - 3:00 PM EST</div>
-                            <div class="event-detail">👥 NAPEO members + industry partners</div>
-                            <div class="event-detail">📍 Zoom</div>
-                        </div>
-                        <a href="https://www.google.com/calendar/event?eid=XzYwcTMwYzFnNjBvMzBlMWk2MG80YWMxZzYwcmo4Z3BsODhyajJjMWg4NHMzNGg5ZzYwczMwYzFnNjBvMzBjMWc4NG9qMGdhNjhoMWtjaGExNnQzNDhncGc2NG8zMGMxZzYwbzMwYzFnNjBvMzBjMWc2MG8zMmMxZzYwbzMwYzFnNmdyazJlYTQ2cDEzZWc5bTg1MTM4YzFrODUxM2FlMjM2NHJqY2hpMTZ0MGowZWEzOG9zMF8yMDI2MDMyNlQxOTAwMDBaIGxhdXJlbi5lc2NhbGFudGVAZ3VzdG8uY29t" target="_blank" class="event-link">View in Calendar</a>
+                    <div class="stat-card">
+                        <span class="stat-number">6</span>
+                        <div class="stat-label">Upcoming Meetings</div>
                     </div>
-
-                    <div class="calendar-event">
-                        <div class="event-title">NPRC Government Relations Manager Monthly Meeting</div>
-                        <div class="event-details">
-                            <div class="event-detail">📅 April 3, 2026 at 11:00 AM - 12:00 PM EST</div>
-                            <div class="event-detail">👥 Shelly, Erica, Ali, Greg, Lauren + industry partners (ADP, Paychex, UKG, Paylocity, Intuit, etc.)</div>
-                            <div class="event-detail">📍 Zoom</div>
-                        </div>
-                        <a href="https://www.google.com/calendar/event?eid=MTBhcnVxYWMzbzd2MWs5cWt0ZWJxbTBybGJfMjAyNjA0MDNUMTYwMDAwWiBsYXVyZW4uZXNjYWxhbnRlQGd1c3RvLmNvbQ" target="_blank" class="event-link">View in Calendar</a>
+                    <div class="stat-card">
+                        <span class="stat-number">17</span>
+                        <div class="stat-label">Past Meeting Notes</div>
                     </div>
+                    <div class="stat-card">
+                        <span class="stat-number" id="total-actions">6</span>
+                        <div class="stat-label">Action Items</div>
+                    </div>
+                </div>
 
-<div class="calendar-event">
-                        <div class="event-title">NPRC State Emerging Issues Monthly Meeting</div>
-                        <div class="event-details">
-                            <div class="event-detail">📅 April 7, 2026 at 1:30 PM - 3:00 PM EST</div>
-                            <div class="event-detail">👥 Ali, Erica, Greg, Lauren, Shelly + industry compliance partners</div>
-                            <div class="event-detail">🔁 Monthly meeting for state emerging issues</div>
+                <div style="margin-top: 30px;">
+                    <h2 style="color: #192532; margin-bottom: 20px;">Quick Access</h2>
+                    <div class="quick-stats">
+                        <div class="quick-stat" onclick="switchTab('reminders')">
+                            <span class="quick-stat-number" id="urgent-reminders">0</span>
+                            <div class="quick-stat-label">Urgent Reminders</div>
                         </div>
-                        <a href="https://www.google.com/calendar/event?eid=bGJyamRjYmJsYzAyZ2ZxazQ0MjA0bWpidjVfMjAyNjA0MDdUMTgzMDAwWiBsYXVyZW4uZXNjYWxhbnRlQGd1c3RvLmNvbQ" target="_blank" class="event-link">View in Calendar</a>
+                        <div class="quick-stat" onclick="switchTab('states')">
+                            <span class="quick-stat-number">4</span>
+                            <div class="quick-stat-label">Active States</div>
+                        </div>
+                        <div class="quick-stat" onclick="switchTab('actions')">
+                            <span class="quick-stat-number">4</span>
+                            <div class="quick-stat-label">High Priority</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div style="margin-top: 30px;">
+                    <h2 style="color: #192532; margin-bottom: 20px;">Recent Activity</h2>
+                    <div class="item-card">
+                        <div class="item-title">Nevada + Gusto Quarterly Sync</div>
+                        <div class="item-meta">
+                            <span>March 16, 2026</span>
+                            <span>Most Recent Meeting</span>
+                        </div>
+                        <a href="https://docs.google.com/document/d/19PfQxBxGeQnBnf7dF0-q0K93p8PZkSDaSSLPhT3Melc/edit" target="_blank" class="item-link">View Notes</a>
+                    </div>
+                    <div class="item-card">
+                        <div class="item-title">Colorado DOR Onsite @ Gusto</div>
+                        <div class="item-meta">
+                            <span>March 19, 2026</span>
+                            <span>Recent Meeting</span>
+                        </div>
+                        <a href="https://www.google.com/calendar/event?eid=Njc1ODl2djhiM2pza2dlMTJzZXFoZTJqMTYgbGF1cmVuLmVzY2FsYW50ZUBndXN0by5jb20" target="_blank" class="item-link">View in Calendar</a>
                     </div>
                 </div>
             </div>
 
-            <!-- Past Meeting Notes -->
-            <div class="section">
-                <h2 class="section-title">Past Meeting Notes & Documentation</h2>
-                <div class="meetings-grid">
-                    <div class="meeting-card">
-                        <div class="meeting-header">
-                            <div>
-                                <div class="meeting-title">NPRC - PFML Subcommittee</div>
-                                <span class="category-tag">Meeting Notes</span>
-                                <span class="category-tag">Monthly</span>
-                            </div>
-                            <div class="meeting-date">Ongoing</div>
-                        </div>
-                        <div class="meeting-details">
-                            <div class="meeting-detail">
-                                <span class="detail-label">Attendees:</span>
-                                <span class="detail-value">Shelly Abril, Kurt Shoemaker, state PFML agencies</span>
-                            </div>
-                            <div class="meeting-detail">
-                                <span class="detail-label">Summary:</span>
-                                <span class="detail-value">Ongoing PFML compliance discussions across multiple states including CO, MA, MN, ME</span>
-                            </div>
-                        </div>
-                        <a href="https://docs.google.com/document/d/1zbvcZwsX33IB2XFzuBxcCnNR6m6BYqOEV8iSICCom7c/edit?tab=t.kqh82zz7iu0s#heading=h.887etagfqt7" target="_blank" class="meeting-link">📄 Meeting Notes</a>
-                    </div>
-
-                    <div class="meeting-card">
-                        <div class="meeting-header">
-                            <div>
-                                <div class="meeting-title">NPRC Authorization Meetings</div>
-                                <span class="category-tag">Meeting Recaps</span>
-                                <span class="category-tag">Monthly</span>
-                            </div>
-                            <div class="meeting-date">Mar 23, 2026</div>
-                        </div>
-                        <div class="meeting-details">
-                            <div class="meeting-detail">
-                                <span class="detail-label">Attendees:</span>
-                                <span class="detail-value">Shelly Abril, Michelle Ramsey, Zachary Gregory, Kurt Shoemaker, state reps</span>
-                            </div>
-                            <div class="meeting-detail">
-                                <span class="detail-label">Topics:</span>
-                                <span class="detail-value">UI tax issues, UWC conference, SIDES integration, state coordination</span>
-                            </div>
-                        </div>
-                        <a href="https://docs.google.com/document/d/1KbXZeLGxcz1UFEJo-uimxUPKMb01a_IzyTiWXzMwBVU/edit" target="_blank" class="meeting-link">📄 All Meeting Recaps</a>
-                    </div>
-
-                    <div class="meeting-card">
-                        <div class="meeting-header">
-                            <div>
-                                <div class="meeting-title">NPRC <> CO DOR</div>
-                                <span class="category-tag">Agency Meeting</span>
-                                <span class="category-tag">Ad-hoc</span>
-                            </div>
-                            <div class="meeting-date">Mar 11, 2026</div>
-                        </div>
-                        <div class="meeting-details">
-                            <div class="meeting-detail">
-                                <span class="detail-label">Attendees:</span>
-                                <span class="detail-value">Gusto team, CO DOR representatives</span>
-                            </div>
-                            <div class="meeting-detail">
-                                <span class="detail-label">Summary:</span>
-                                <span class="detail-value">Colorado Department of Revenue agency meeting discussion</span>
-                            </div>
-                        </div>
-                        <a href="https://drive.google.com/file/d/1AGKaJzgxAyALPjsRDA6EW7P8B7EgpL9C/view" target="_blank" class="meeting-link">🎥 Video Recording</a>
-                        <a href="https://drive.google.com/file/d/1ykScyw5vNu11srmpR30OAY3enOhJCoZo/view" target="_blank" class="meeting-link">📄 Dec 2025 Recap</a>
-                    </div>
-
-                    <div class="meeting-card">
-                        <div class="meeting-header">
-                            <div>
-                                <div class="meeting-title">Gusto <> NV DETR</div>
-                                <span class="category-tag">Agency Meeting</span>
-                                <span class="category-tag">Quarterly</span>
-                            </div>
-                            <div class="meeting-date">Mar 16, 2026</div>
-                        </div>
-                        <div class="meeting-details">
-                            <div class="meeting-detail">
-                                <span class="detail-label">Attendees:</span>
-                                <span class="detail-value">Gusto team, Nevada DETR (unemployment insurance)</span>
-                            </div>
-                            <div class="meeting-detail">
-                                <span class="detail-label">Summary:</span>
-                                <span class="detail-value">Nevada unemployment insurance matters and quarterly sync</span>
-                            </div>
-                        </div>
-                        <a href="https://drive.google.com/file/d/1tjhXMs0E18UpBq2UiSO3tEC7OZZq5JFK/view" target="_blank" class="meeting-link">📄 Meeting Recap</a>
-                        <a href="https://docs.google.com/document/d/19PfQxBxGeQnBnf7dF0-q0K93p8PZkSDaSSLPhT3Melc/edit" target="_blank" class="meeting-link">📄 Current Meeting Notes</a>
-                    </div>
-
-                    <div class="meeting-card">
-                        <div class="meeting-header">
-                            <div>
-                                <div class="meeting-title">Nevada SUI & MBT Reference</div>
-                                <span class="category-tag">Reference Doc</span>
-                            </div>
-                            <div class="meeting-date">Feb 19, 2026</div>
-                        </div>
-                        <div class="meeting-details">
-                            <div class="meeting-detail">
-                                <span class="detail-label">Content:</span>
-                                <span class="detail-value">Nevada State Unemployment Insurance and Modified Business Tax requirements</span>
-                            </div>
-                        </div>
-                        <a href="https://docs.google.com/document/d/1rL5XTvLB8ve_YSd6bSxYmUE21k4d4tty5MOHhIogc_E/edit" target="_blank" class="meeting-link">📄 View Document</a>
-                    </div>
-
-                    <div class="meeting-card">
-                        <div class="meeting-header">
-                            <div>
-                                <div class="meeting-title">NPRC <> Colorado DOR Agency Meetings</div>
-                                <span class="category-tag">Meeting Notes</span>
-                                <span class="category-tag">Ongoing</span>
-                            </div>
-                            <div class="meeting-date">Ongoing</div>
-                        </div>
-                        <div class="meeting-details">
-                            <div class="meeting-detail">
-                                <span class="detail-label">Content:</span>
-                                <span class="detail-value">Ongoing Colorado Department of Revenue agency meeting notes and recaps</span>
-                            </div>
-                        </div>
-                        <a href="https://docs.google.com/document/d/12rqEZUOOoC33Ew0iljknI3CWT5jMnQLKHfHuoB4acew/edit" target="_blank" class="meeting-link">📄 View Notes</a>
-                    </div>
-
-                    <div class="meeting-card">
-                        <div class="meeting-header">
-                            <div>
-                                <div class="meeting-title">NPRC Government Relations Managers - Session Notes</div>
-                                <span class="category-tag">Meeting Notes</span>
-                                <span class="category-tag">Monthly</span>
-                            </div>
-                            <div class="meeting-date">Mar 13, 2026</div>
-                        </div>
-                        <div class="meeting-details">
-                            <div class="meeting-detail">
-                                <span class="detail-label">Content:</span>
-                                <span class="detail-value">NPRC Government Relations Manager monthly meeting session notes and discussions</span>
-                            </div>
-                        </div>
-                        <a href="https://docs.google.com/document/d/1_ymQyiDiBuV_SrWlsjA8w8MUChW-d83Wga4qA1oSqdM/edit" target="_blank" class="meeting-link">📄 View Notes</a>
-                    </div>
-
-                    <div class="meeting-card">
-                        <div class="meeting-header">
-                            <div>
-                                <div class="meeting-title">NPRC Monthly Member Notes</div>
-                                <span class="category-tag">Meeting Notes</span>
-                                <span class="category-tag">Monthly</span>
-                            </div>
-                            <div class="meeting-date">Mar 11, 2026</div>
-                        </div>
-                        <div class="meeting-details">
-                            <div class="meeting-detail">
-                                <span class="detail-label">Content:</span>
-                                <span class="detail-value">NPRC monthly member meeting notes and key discussion points</span>
-                            </div>
-                        </div>
-                        <a href="https://docs.google.com/document/d/1vqUqm9TYW8t2pH3_G2yWuBXuj60Ni_dvGDMBg4I8OqU/edit" target="_blank" class="meeting-link">📄 View Notes</a>
-                    </div>
-
-                    <div class="meeting-card">
-                        <div class="meeting-header">
-                            <div>
-                                <div class="meeting-title">NAPEO SGAC Notes</div>
-                                <span class="category-tag">Meeting Notes</span>
-                                <span class="category-tag">Monthly</span>
-                            </div>
-                            <div class="meeting-date">Mar 2, 2026</div>
-                        </div>
-                        <div class="meeting-details">
-                            <div class="meeting-detail">
-                                <span class="detail-label">Content:</span>
-                                <span class="detail-value">NAPEO State Government Affairs Committee meeting notes</span>
-                            </div>
-                        </div>
-                        <a href="https://docs.google.com/document/d/1M5LlEf0y2cRZGx67Cf55fq0cmr9_-t1bzPZIjth7aMA/edit" target="_blank" class="meeting-link">📄 View Notes</a>
-                    </div>
-
-                    <div class="meeting-card">
-                        <div class="meeting-header">
-                            <div>
-                                <div class="meeting-title">Idaho SUI Discussion Notes</div>
-                                <span class="category-tag">Meeting Notes</span>
-                            </div>
-                            <div class="meeting-date">Nov 14, 2025</div>
-                        </div>
-                        <div class="meeting-details">
-                            <div class="meeting-detail">
-                                <span class="detail-label">Content:</span>
-                                <span class="detail-value">Idaho State Unemployment Insurance discussion and meeting notes</span>
-                            </div>
-                        </div>
-                        <a href="https://docs.google.com/document/d/1fskdvPhjV25mSgIuT2T0dN9dafYmm_JzLQsSHoTup1o/edit" target="_blank" class="meeting-link">📄 View Notes</a>
-                    </div>
-
-                    <div class="meeting-card">
-                        <div class="meeting-header">
-                            <div>
-                                <div class="meeting-title">Money Transmitter Licensing <> NPRC Monthly Meeting</div>
-                                <span class="category-tag">Meeting Notes</span>
-                                <span class="category-tag">Monthly</span>
-                            </div>
-                            <div class="meeting-date">Nov 19, 2025</div>
-                        </div>
-                        <div class="meeting-details">
-                            <div class="meeting-detail">
-                                <span class="detail-label">Content:</span>
-                                <span class="detail-value">NPRC MTL (Money Transmitter Licensing) monthly meeting notes</span>
-                            </div>
-                        </div>
-                        <a href="https://docs.google.com/document/d/1YN1KoP_hDxiguiGPEw23Yx_mHkiu2lMKN91Or4TWSvk/edit" target="_blank" class="meeting-link">📄 View Notes</a>
-                    </div>
-
-                    <div class="meeting-card">
-                        <div class="meeting-header">
-                            <div>
-                                <div class="meeting-title">NPRC Tips/OT Subgroup Meeting Minutes</div>
-                                <span class="category-tag">Meeting Notes</span>
-                                <span class="category-tag">Subgroup</span>
-                            </div>
-                            <div class="meeting-date">Sep 3, 2025</div>
-                        </div>
-                        <div class="meeting-details">
-                            <div class="meeting-detail">
-                                <span class="detail-label">Content:</span>
-                                <span class="detail-value">NPRC OT Tips & Compensation subgroup meeting minutes</span>
-                            </div>
-                        </div>
-                        <a href="https://docs.google.com/document/d/1sHjs6u94QMytIp3GS8J3yaAL5Mtv0ZpdcoVGgAIWOx8/edit" target="_blank" class="meeting-link">📄 View Notes</a>
-                    </div>
-
-                    <div class="meeting-card">
-                        <div class="meeting-header">
-                            <div>
-                                <div class="meeting-title">External Agency Meeting Notes</div>
-                                <span class="category-tag">Meeting Notes</span>
-                                <span class="category-tag">External</span>
-                            </div>
-                            <div class="meeting-date">Mar 10, 2026</div>
-                        </div>
-                        <div class="meeting-details">
-                            <div class="meeting-detail">
-                                <span class="detail-label">Content:</span>
-                                <span class="detail-value">External agency meeting notes and documentation (PDF)</span>
-                            </div>
-                        </div>
-                        <a href="https://drive.google.com/file/d/1ycrUdSXtYGkxBpFU8DauPAUvbTB9dJ9G/view" target="_blank" class="meeting-link">📄 View PDF</a>
-                    </div>
-
-                    <div class="meeting-card">
-                        <div class="meeting-header">
-                            <div>
-                                <div class="meeting-title">Government Affairs Meeting Notes</div>
-                                <span class="category-tag">Meeting Notes</span>
-                                <span class="category-tag">Ongoing</span>
-                            </div>
-                            <div class="meeting-date">Ongoing</div>
-                        </div>
-                        <div class="meeting-details">
-                            <div class="meeting-detail">
-                                <span class="detail-label">Content:</span>
-                                <span class="detail-value">General government affairs and agency meetings documentation</span>
-                            </div>
-                        </div>
-                        <a href="https://docs.google.com/document/d/1DmLZ_E-3MfQ5ao0Dhn2vfy_bhXR05kwSeY1A5K3tz2Q/edit" target="_blank" class="meeting-link">📄 View Notes</a>
-                    </div>
-
-                    <div class="meeting-card">
-                        <div class="meeting-header">
-                            <div>
-                                <div class="meeting-title">Industry Call Coordination Tracker</div>
-                                <span class="category-tag">Tracking Sheet</span>
-                            </div>
-                            <div class="meeting-date">Live</div>
-                        </div>
-                        <div class="meeting-details">
-                            <div class="meeting-detail">
-                                <span class="detail-label">Content:</span>
-                                <span class="detail-value">Comprehensive tracking of all industry and agency call coordination</span>
-                            </div>
-                        </div>
-                        <a href="https://docs.google.com/spreadsheets/d/1_XBy7CTNrWuYss7BSWZwj5xQhKwuem_pao5B1r2FumE/edit" target="_blank" class="meeting-link">📊 View Tracker</a>
-                    </div>
+            <!-- Reminders Tab -->
+            <div id="reminders-tab-content" class="tab-content">
+                <h2 style="color: #192532; margin-bottom: 20px;">Upcoming Action Items</h2>
+                <div id="reminder-summary" style="display: none;">
+                    <div id="reminder-list" style="display: flex; flex-direction: column; gap: 15px;"></div>
+                </div>
+                <div id="no-reminders" style="text-align: center; padding: 60px; color: #6B7785;">
+                    <div style="font-size: 3em; margin-bottom: 15px;">✓</div>
+                    <div style="font-size: 1.2em;">No urgent reminders at this time</div>
                 </div>
             </div>
 
-            <!-- Action Items -->
-            <div class="section">
-                <h2 class="section-title">Meeting Action Items</h2>
-                <div class="todo-grid">
-                    <div class="todo-item high" data-id="1" onclick="toggleTodo(1)">
-                        <div class="todo-header">
-                            <div style="display: flex; align-items: center; gap: 10px;">
-                                <span class="expand-icon" id="expand-1">▶</span>
-                                <div class="todo-title">UI Tax Issues / Employer Sessions</div>
-                            </div>
-                            <div style="display: flex; align-items: center; gap: 10px;">
-                                <span class="priority-badge high">High</span>
-                                <span class="status-badge todo" id="status-badge-1">TODO</span>
+            <!-- Actions Tab -->
+            <div id="actions-tab-content" class="tab-content">
+                <h2 style="color: #192532; margin-bottom: 20px;">All Action Items</h2>
+
+                <div class="filter-bar">
+                    <span style="color: #6B7785; font-weight: 600;">Filter:</span>
+                    <button class="filter-button active" onclick="filterActions('all')">All</button>
+                    <button class="filter-button" onclick="filterActions('high')">High Priority</button>
+                    <button class="filter-button" onclick="filterActions('medium')">Medium Priority</button>
+                    <button class="filter-button" onclick="filterActions('todo')">TODO</button>
+                </div>
+
+                <div id="all-actions-list">
+                    <!-- Nevada Actions -->
+                    <div class="subsection">
+                        <div class="subsection-title">Nevada</div>
+                        <div class="item-card checkbox-item action-item" data-priority="medium" data-state="Nevada" data-id="nv-action-1">
+                            <input type="checkbox" onchange="toggleActionItem(this, 'nv-action-1')">
+                            <div class="checkbox-content">
+                                <div class="item-title">Nevada DETR Follow-up</div>
+                                <div class="item-meta">
+                                    <span>Status: TODO</span>
+                                    <span>Priority: Medium</span>
+                                </div>
                             </div>
                         </div>
-                        <div class="todo-meta">
-                            <span>📅 Due: Apr 14-16, 2026</span>
-                            <span>🏢 NPRC</span>
-                        </div>
-                        <div class="todo-details" id="details-1">
-                            <p style="color: #666; margin-bottom: 15px;">NPRC scheduling UI tax issues and employer sessions</p>
-                            <div class="todo-actions" onclick="event.stopPropagation()">
-                                <select class="status-select" id="status-1" onchange="updateStatus(1)">
-                                    <option value="TODO">TODO</option>
-                                    <option value="IN_PROGRESS">In Progress</option>
-                                    <option value="DONE">Done</option>
-                                </select>
-                                <button class="complete-btn" onclick="markComplete(1)">✓ Mark Complete</button>
+                        <div class="item-card checkbox-item action-item" data-priority="medium" data-state="Nevada" data-id="nv-action-2">
+                            <input type="checkbox" onchange="toggleActionItem(this, 'nv-action-2')">
+                            <div class="checkbox-content">
+                                <div class="item-title">Nevada MBT Compliance</div>
+                                <div class="item-meta">
+                                    <span>Status: TODO</span>
+                                    <span>Priority: Medium</span>
+                                </div>
                             </div>
                         </div>
                     </div>
 
-                    <div class="todo-item high" data-id="2" onclick="toggleTodo(2)">
-                        <div class="todo-header">
-                            <div style="display: flex; align-items: center; gap: 10px;">
-                                <span class="expand-icon" id="expand-2">▶</span>
-                                <div class="todo-title">UWC Conference Attendance</div>
-                            </div>
-                            <div style="display: flex; align-items: center; gap: 10px;">
-                                <span class="priority-badge high">High</span>
-                                <span class="status-badge todo" id="status-badge-2">TODO</span>
-                            </div>
-                        </div>
-                        <div class="todo-meta">
-                            <span>📅 Due: May 2026</span>
-                            <span>🏢 NPRC</span>
-                        </div>
-                        <div class="todo-details" id="details-2">
-                            <p style="color: #666; margin-bottom: 15px;">Send team members to attend UWC conference, US DOL will be there</p>
-                            <div class="todo-actions" onclick="event.stopPropagation()">
-                                <select class="status-select" id="status-2" onchange="updateStatus(2)">
-                                    <option value="TODO">TODO</option>
-                                    <option value="IN_PROGRESS">In Progress</option>
-                                    <option value="DONE">Done</option>
-                                </select>
-                                <button class="complete-btn" onclick="markComplete(2)">✓ Mark Complete</button>
+                    <!-- NPRC Actions -->
+                    <div class="subsection">
+                        <div class="subsection-title">NPRC (Multi-State)</div>
+                        <div class="item-card checkbox-item action-item" data-priority="high" data-state="NPRC" data-id="nprc-action-1">
+                            <input type="checkbox" onchange="toggleActionItem(this, 'nprc-action-1')">
+                            <div class="checkbox-content">
+                                <div class="item-title">UI Tax Issues / Employer Sessions</div>
+                                <div class="item-meta">
+                                    <span>Status: TODO</span>
+                                    <span>Priority: HIGH</span>
+                                    <span>Due: Apr 14-16, 2026</span>
+                                </div>
                             </div>
                         </div>
-                    </div>
-
-                    <div class="todo-item high" data-id="3" onclick="toggleTodo(3)">
-                        <div class="todo-header">
-                            <div style="display: flex; align-items: center; gap: 10px;">
-                                <span class="expand-icon" id="expand-3">▶</span>
-                                <div class="todo-title">PFML Fed Guidance Compliance Review</div>
-                            </div>
-                            <div style="display: flex; align-items: center; gap: 10px;">
-                                <span class="priority-badge high">High</span>
-                                <span class="status-badge todo" id="status-badge-3">TODO</span>
+                        <div class="item-card checkbox-item action-item" data-priority="high" data-state="NPRC" data-id="nprc-action-2">
+                            <input type="checkbox" onchange="toggleActionItem(this, 'nprc-action-2')">
+                            <div class="checkbox-content">
+                                <div class="item-title">UWC Conference Attendance</div>
+                                <div class="item-meta">
+                                    <span>Status: TODO</span>
+                                    <span>Priority: HIGH</span>
+                                    <span>Due: May 2026</span>
+                                </div>
                             </div>
                         </div>
-                        <div class="todo-meta">
-                            <span>🏢 NPRC PFML</span>
-                        </div>
-                        <div class="todo-details" id="details-3">
-                            <p style="color: #666; margin-bottom: 15px;">Review IRS taxability analysis for CO, MA, MN PFML programs</p>
-                            <div class="todo-actions" onclick="event.stopPropagation()">
-                                <select class="status-select" id="status-3" onchange="updateStatus(3)">
-                                    <option value="TODO">TODO</option>
-                                    <option value="IN_PROGRESS">In Progress</option>
-                                    <option value="DONE">Done</option>
-                                </select>
-                                <button class="complete-btn" onclick="markComplete(3)">✓ Mark Complete</button>
+                        <div class="item-card checkbox-item action-item" data-priority="high" data-state="NPRC" data-id="nprc-action-3">
+                            <input type="checkbox" onchange="toggleActionItem(this, 'nprc-action-3')">
+                            <div class="checkbox-content">
+                                <div class="item-title">PFML Fed Guidance Compliance Review</div>
+                                <div class="item-meta">
+                                    <span>Status: TODO</span>
+                                    <span>Priority: HIGH</span>
+                                </div>
                             </div>
                         </div>
-                    </div>
-
-                    <div class="todo-item medium" data-id="4" onclick="toggleTodo(4)">
-                        <div class="todo-header">
-                            <div style="display: flex; align-items: center; gap: 10px;">
-                                <span class="expand-icon" id="expand-4">▶</span>
-                                <div class="todo-title">Nevada DETR Follow-up</div>
-                            </div>
-                            <div style="display: flex; align-items: center; gap: 10px;">
-                                <span class="priority-badge medium">Medium</span>
-                                <span class="status-badge todo" id="status-badge-4">TODO</span>
-                            </div>
-                        </div>
-                        <div class="todo-meta">
-                            <span>🏢 NV DETR</span>
-                        </div>
-                        <div class="todo-details" id="details-4">
-                            <p style="color: #666; margin-bottom: 15px;">Follow up on Nevada unemployment insurance meeting items from Mar 16 sync</p>
-                            <div class="todo-actions" onclick="event.stopPropagation()">
-                                <select class="status-select" id="status-4" onchange="updateStatus(4)">
-                                    <option value="TODO">TODO</option>
-                                    <option value="IN_PROGRESS">In Progress</option>
-                                    <option value="DONE">Done</option>
-                                </select>
-                                <button class="complete-btn" onclick="markComplete(4)">✓ Mark Complete</button>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="todo-item medium" data-id="5" onclick="toggleTodo(5)">
-                        <div class="todo-header">
-                            <div style="display: flex; align-items: center; gap: 10px;">
-                                <span class="expand-icon" id="expand-5">▶</span>
-                                <div class="todo-title">Nevada MBT Compliance</div>
-                            </div>
-                            <div style="display: flex; align-items: center; gap: 10px;">
-                                <span class="priority-badge medium">Medium</span>
-                                <span class="status-badge todo" id="status-badge-5">TODO</span>
-                            </div>
-                        </div>
-                        <div class="todo-meta">
-                            <span>🏢 NV MBT</span>
-                        </div>
-                        <div class="todo-details" id="details-5">
-                            <p style="color: #666; margin-bottom: 15px;">Nevada Modified Business Tax compliance requirements review</p>
-                            <div class="todo-actions" onclick="event.stopPropagation()">
-                                <select class="status-select" id="status-5" onchange="updateStatus(5)">
-                                    <option value="TODO">TODO</option>
-                                    <option value="IN_PROGRESS">In Progress</option>
-                                    <option value="DONE">Done</option>
-                                </select>
-                                <button class="complete-btn" onclick="markComplete(5)">✓ Mark Complete</button>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="todo-item medium" data-id="6" onclick="toggleTodo(6)">
-                        <div class="todo-header">
-                            <div style="display: flex; align-items: center; gap: 10px;">
-                                <span class="expand-icon" id="expand-6">▶</span>
-                                <div class="todo-title">FTA Technology Outreach</div>
-                            </div>
-                            <div style="display: flex; align-items: center; gap: 10px;">
-                                <span class="priority-badge medium">Medium</span>
-                                <span class="status-badge todo" id="status-badge-6">TODO</span>
-                            </div>
-                        </div>
-                        <div class="todo-meta">
-                            <span>👤 Owner: Shelly</span>
-                            <span>🏢 NPRC</span>
-                        </div>
-                        <div class="todo-details" id="details-6">
-                            <p style="color: #666; margin-bottom: 15px;">Reach out to FTA regarding technology initiatives</p>
-                            <div class="todo-actions" onclick="event.stopPropagation()">
-                                <select class="status-select" id="status-6" onchange="updateStatus(6)">
-                                    <option value="TODO">TODO</option>
-                                    <option value="IN_PROGRESS">In Progress</option>
-                                    <option value="DONE">Done</option>
-                                </select>
-                                <button class="complete-btn" onclick="markComplete(6)">✓ Mark Complete</button>
+                        <div class="item-card checkbox-item action-item" data-priority="medium" data-state="NPRC" data-id="nprc-action-4">
+                            <input type="checkbox" onchange="toggleActionItem(this, 'nprc-action-4')">
+                            <div class="checkbox-content">
+                                <div class="item-title">FTA Technology Outreach</div>
+                                <div class="item-meta">
+                                    <span>Status: TODO</span>
+                                    <span>Priority: MEDIUM</span>
+                                    <span>Owner: Shelly</span>
+                                </div>
                             </div>
                         </div>
                     </div>
                 </div>
             </div>
+
+            <!-- States Tab -->
+            <div id="states-tab-content" class="tab-content">
+                <h2 style="color: #192532; margin-bottom: 20px;">States Dashboard</h2>
+            <div class="states-grid">
+            <!-- NAPEO Section -->
+            <div class="state-section">
+                <div class="state-header" onclick="toggleStateSection(this)">
+                    <div class="state-title">NAPEO <span class="collapse-icon">▼</span></div>
+                    <div class="activity-badges">
+                        <a href="#napeo-upcoming" class="activity-badge hot">1 Upcoming</a>
+                        <a href="#napeo-notes" class="activity-badge">1 Note</a>
+                    </div>
+                </div>
+                <div class="state-content">
+                    <div style="margin-bottom: 20px;">
+                        <a href="https://drive.google.com/drive/folders/1biQyDczxshNJLwLjGVL9Vf8ilPe_GlwU" target="_blank" class="item-link">NAPEO Drive Folder</a>
+                    </div>
+                    <div class="subsection" id="napeo-upcoming">
+                        <div class="subsection-title">Upcoming Meetings</div>
+                        <div class="item-card">
+                            <div class="item-title">NAPEO State Government Affairs Committee</div>
+                            <div class="item-meta">
+                                <span>March 26, 2026 at 2:00 PM - 3:00 PM EST</span>
+                                <span>NAPEO members + industry partners</span>
+                            </div>
+                            <a href="https://www.google.com/calendar/event?eid=XzYwcTMwYzFnNjBvMzBlMWk2MG80YWMxZzYwcmo4Z3BsODhyajJjMWg4NHMzNGg5ZzYwczMwYzFnNjBvMzBjMWc4NG9qMGdhNjhoMWtjaGExNnQzNDhncGc2NG8zMGMxZzYwbzMwYzFnNjBvMzBjMWc2MG8zMmMxZzYwbzMwYzFnNmdyazJlYTQ2cDEzZWc5bTg1MTM4YzFrODUxM2FlMjM2NHJqY2hpMTZ0MGowZWEzOG9zMF8yMDI2MDMyNlQxOTAwMDBaIGxhdXJlbi5lc2NhbGFudGVAZ3VzdG8uY29t" target="_blank" class="item-link">View in Calendar</a>
+                        </div>
+                    </div>
+
+                    <div class="subsection" id="napeo-notes">
+                        <div class="subsection-title">Past Meeting Notes</div>
+                        <div class="item-card">
+                            <div class="item-title">NAPEO SGAC Notes</div>
+                            <div class="item-meta">
+                                <span>March 2, 2026 | State Government Affairs Committee</span>
+                            </div>
+                            <a href="https://docs.google.com/document/d/1M5LlEf0y2cRZGx67Cf55fq0cmr9_-t1bzPZIjth7aMA/edit" target="_blank" class="item-link">View Notes</a>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+
+            <!-- Nevada Section -->
+            <div class="state-section">
+                <div class="state-header" onclick="toggleStateSection(this)">
+                    <div class="state-title">Nevada <span class="collapse-icon">▼</span></div>
+                    <div class="activity-badges">
+                        <a href="#nv-upcoming" class="activity-badge hot">1 Upcoming</a>
+                        <a href="#nv-notes" class="activity-badge">3 Notes</a>
+                        <a href="#nv-actions" class="activity-badge">2 Actions</a>
+                    </div>
+                </div>
+                <div class="state-content">
+                    <div style="margin-bottom: 20px;">
+                        <span style="color: #6B7785; font-size: 0.9em;">No dedicated Drive folder found</span>
+                    </div>
+                    <div class="subsection" id="nv-upcoming">
+                        <div class="subsection-title">Upcoming Meetings</div>
+                        <div class="item-card">
+                            <div class="item-title">NV SUI Filing Success Rate Focus Discussion</div>
+                            <div class="item-meta">
+                                <span>March 26, 2026 at 9:00 AM - 10:00 AM EST</span>
+                                <span>Lauren, Jay Hoerr, Esther Ou</span>
+                            </div>
+                            <a href="https://www.google.com/calendar/event?eid=NHFzOGZ0aTBla25yOTQycTRwY2VlMzBlMzAgbGF1cmVuLmVzY2FsYW50ZUBndXN0by5jb20" target="_blank" class="item-link">View in Calendar</a>
+                        </div>
+                    </div>
+
+                    <div class="subsection" id="nv-notes">
+                        <div class="subsection-title">Past Meeting Notes</div>
+                        <div class="item-card">
+                            <div class="item-title">Nevada + Gusto Quarterly Sync</div>
+                            <div class="item-meta">
+                                <span>March 16, 2026</span>
+                                <span>Esther Ou, Lauren, Nevada DETR team</span>
+                            </div>
+                            <a href="https://www.google.com/calendar/event?eid=ZTRram5wOW05cWRwZWFucTJsZDg1N2dpMzNfMjAyNjAzMTZUMTgwMDAwWiBsYXVyZW4uZXNjYWxhbnRlQGd1c3RvLmNvbQ" target="_blank" class="item-link">View in Calendar</a>
+                            <a href="https://docs.google.com/document/d/19PfQxBxGeQnBnf7dF0-q0K93p8PZkSDaSSLPhT3Melc/edit" target="_blank" class="item-link">Meeting Notes</a>
+                            <a href="https://mail.google.com/mail/u/0/#inbox/19ce8e0861e101a3" target="_blank" class="item-link">Agenda Email (3/13/26)</a>
+                            <a href="https://mail.google.com/mail/u/0/#inbox/19d03219c77b0b3f" target="_blank" class="item-link">Recap Email (3/18/26)</a>
+                            <a href="https://mail.google.com/mail/u/0/#inbox/19d1b202d8965a6d" target="_blank" class="item-link">Revised Notes Email (3/23/26)</a>
+                        </div>
+                        <div class="item-card">
+                            <div class="item-title">Gusto <> NV DETR Meeting Notes</div>
+                            <div class="item-meta">
+                                <span>Nevada DETR (Unemployment Insurance)</span>
+                                <span>March 16, 2026</span>
+                            </div>
+                            <a href="https://drive.google.com/file/d/1tjhXMs0E18UpBq2UiSO3tEC7OZZq5JFK/view" target="_blank" class="item-link">Meeting Recap</a>
+                            <a href="https://docs.google.com/document/d/19PfQxBxGeQnBnf7dF0-q0K93p8PZkSDaSSLPhT3Melc/edit" target="_blank" class="item-link">Current Notes</a>
+                        </div>
+                        <div class="item-card">
+                            <div class="item-title">Nevada SUI & MBT Reference</div>
+                            <div class="item-meta">
+                                <span>State Unemployment Insurance and Modified Business Tax</span>
+                                <span>February 19, 2026</span>
+                            </div>
+                            <a href="https://docs.google.com/document/d/1rL5XTvLB8ve_YSd6bSxYmUE21k4d4tty5MOHhIogc_E/edit" target="_blank" class="item-link">View Document</a>
+                            <a href="https://gustohq.slack.com/archives/C06TREZDFNJ/p1771516078981699" target="_blank" class="item-link">Slack Recap (2/19/26)</a>
+                            <a href="https://gustohq.slack.com/archives/C091P29AWH3/p1771515986654739" target="_blank" class="item-link">Slack (NV Portal)</a>
+                        </div>
+                    </div>
+
+                    <div class="subsection">
+                        <div class="subsection-title">Claude Instructions</div>
+                        <div class="instruction-card">
+                            <div class="instruction-header" onclick="toggleInstruction('nv-meeting-notes')">
+                                <div class="instruction-title">
+                                    <span class="toggle-icon" id="toggle-nv-meeting-notes">▼</span>
+                                    Generate Nevada Meeting Recap
+                                </div>
+                                <button class="copy-btn" onclick="event.stopPropagation(); copyInstruction('nv-meeting-notes', this)">Copy</button>
+                            </div>
+                            <div class="instruction-content" id="instruction-nv-meeting-notes">Please review the meeting notes from https://docs.google.com/document/d/19PfQxBxGeQnBnf7dF0-q0K93p8PZkSDaSSLPhT3Melc/edit and create a professional meeting recap that includes:
+
+1. Key discussion points and decisions made
+2. Action items with owners and due dates
+3. Next steps and follow-up items
+4. Any blockers or concerns raised
+
+Format this as an email suitable for sending to the Nevada DETR team (Esther Ou and Jay Hoerr) and internal stakeholders.</div>
+                        </div>
+
+                        <div class="instruction-card">
+                            <div class="instruction-header" onclick="toggleInstruction('nv-slack-update')">
+                                <div class="instruction-title">
+                                    <span class="toggle-icon" id="toggle-nv-slack-update">▼</span>
+                                    Create Slack Update for #nv_mbt_portal_modernization
+                                </div>
+                                <button class="copy-btn" onclick="event.stopPropagation(); copyInstruction('nv-slack-update', this)">Copy</button>
+                            </div>
+                            <div class="instruction-content" id="instruction-nv-slack-update">Create a concise Slack update for the #nv_mbt_portal_modernization channel summarizing today's Nevada MBT discussion. Include:
+
+- 2-3 key highlights
+- Any important decisions or changes
+- Next meeting date
+- Link to full meeting notes
+
+Keep it brief and actionable - max 3-4 sentences.</div>
+                        </div>
+                    </div>
+
+                    <div class="subsection" id="nv-actions">
+                        <div class="subsection-title">Action Items</div>
+                        <div class="item-card">
+                            <div class="item-title">Nevada DETR Follow-up</div>
+                            <div class="item-meta">
+                                <span>Status: TODO</span>
+                                <span>Priority: Medium</span>
+                            </div>
+                        </div>
+                        <div class="item-card">
+                            <div class="item-title">Nevada MBT Compliance</div>
+                            <div class="item-meta">
+                                <span>Status: TODO</span>
+                                <span>Priority: Medium</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Colorado Section -->
+            <div class="state-section">
+                <div class="state-header" onclick="toggleStateSection(this)">
+                    <div class="state-title">Colorado <span class="collapse-icon">▼</span></div>
+                    <div class="activity-badges">
+                        <a href="#co-upcoming" class="activity-badge hot">1 Upcoming</a>
+                        <a href="#co-notes" class="activity-badge">3 Notes</a>
+                    </div>
+                </div>
+                <div class="state-content">
+                    <div style="margin-bottom: 20px;">
+                        <a href="https://drive.google.com/drive/folders/1zPj74OKi389vs48g7AS8aJbljjpsOVaq" target="_blank" class="item-link">Colorado DOR Drive Folder</a>
+                        <a href="https://drive.google.com/drive/folders/1uXOrvxyl0ebxiiQopyZ3jv4fVOT0mJI-" target="_blank" class="item-link">NPRC <> CO DOR Folder</a>
+                    </div>
+                    <div class="subsection" id="co-upcoming">
+                        <div class="subsection-title">Upcoming Meetings</div>
+                        <div class="item-card">
+                            <div class="item-title">NPRC <> CO DOR June Quarterly Meeting</div>
+                            <div class="item-meta">
+                                <span>June 10, 2026 at 11:00 AM - 12:00 PM EST</span>
+                                <span>Lauren, Marc Maes, Aaron Gonzales + industry partners</span>
+                            </div>
+                            <a href="https://www.google.com/calendar/event?eid=N2VsZTY2MGd1ZzMxMGlucHJxMzA3cGplajQgbGF1cmVuLmVzY2FsYW50ZUBndXN0by5jb20" target="_blank" class="item-link">View in Calendar</a>
+                        </div>
+                    </div>
+
+                    <div class="subsection" id="co-notes">
+                        <div class="subsection-title">Past Meeting Notes</div>
+                        <div class="item-card">
+                            <div class="item-title">Colorado DOR Onsite @ Gusto</div>
+                            <div class="item-meta">
+                                <span>March 19, 2026</span>
+                                <span>Greg, Shelly, Steve Abbott, CO DOR team</span>
+                                <span>DEN-2-T3F6-20 Cat Cafe</span>
+                            </div>
+                            <a href="https://www.google.com/calendar/event?eid=Njc1ODl2djhiM2pza2dlMTJzZXFoZTJqMTYgbGF1cmVuLmVzY2FsYW50ZUBndXN0by5jb20" target="_blank" class="item-link">View in Calendar</a>
+                            <a href="https://mail.google.com/mail/u/0/#inbox/19ce8d70c89ab2f1" target="_blank" class="item-link">Recap Email (3/13/26)</a>
+                        </div>
+                        <div class="item-card">
+                            <div class="item-title">NPRC <> CO DOR Agency Meetings</div>
+                            <div class="item-meta">
+                                <span>Colorado Department of Revenue</span>
+                                <span>Ongoing</span>
+                            </div>
+                            <a href="https://docs.google.com/document/d/12rqEZUOOoC33Ew0iljknI3CWT5jMnQLKHfHuoB4acew/edit" target="_blank" class="item-link">View Notes</a>
+                            <a href="https://mail.google.com/mail/u/0/#inbox/19c8b0775d699101" target="_blank" class="item-link">Agenda Request (2/23/26)</a>
+                        </div>
+                        <div class="item-card">
+                            <div class="item-title">NPRC <> CO DOR Meeting Recap</div>
+                            <div class="item-meta">
+                                <span>Agency Meeting</span>
+                                <span>March 11, 2026</span>
+                            </div>
+                            <a href="https://drive.google.com/file/d/1AGKaJzgxAyALPjsRDA6EW7P8B7EgpL9C/view" target="_blank" class="item-link">Video Recording</a>
+                            <a href="https://drive.google.com/file/d/1ykScyw5vNu11srmpR30OAY3enOhJCoZo/view" target="_blank" class="item-link">Dec 2025 Recap</a>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+
+            <!-- Maine Section -->
+            <div class="state-section">
+                <div class="state-header" onclick="toggleStateSection(this)">
+                    <div class="state-title">Maine <span class="collapse-icon">▼</span></div>
+                    <div class="activity-badges">
+                        <a href="#me-upcoming" class="activity-badge hot">1 Upcoming</a>
+                        <a href="#me-notes" class="activity-badge">1 Note</a>
+                    </div>
+                </div>
+                <div class="state-content">
+                    <div style="margin-bottom: 20px;">
+                        <a href="https://drive.google.com/drive/folders/1vMrDd6fSK00V2Khui4jNcmGs-lURRdgv" target="_blank" class="item-link">Maine PFML Drive Folder</a>
+                        <a href="https://drive.google.com/drive/folders/1RxbfV9v4qN4IvL1h3rqTA5RwIWVviZAA" target="_blank" class="item-link">NPRC <> ME PFML Folder</a>
+                    </div>
+                    <div class="subsection" id="me-upcoming">
+                        <div class="subsection-title">Upcoming Meetings</div>
+                        <div class="item-card">
+                            <div class="item-title">NPRC <> Maine PFML June Quarterly Meeting</div>
+                            <div class="item-meta">
+                                <span>June 3, 2026 at 11:00 AM - 12:00 PM EST</span>
+                                <span>Lauren, Luke O'Monahan, Reginald Parson + industry partners</span>
+                            </div>
+                            <a href="https://www.google.com/calendar/event?eid=MDk0cnVjaGI2NGpkMWZncDZkNXBtZG5pMGogbGF1cmVuLmVzY2FsYW50ZUBndXN0by5jb20" target="_blank" class="item-link">View in Calendar</a>
+                        </div>
+                    </div>
+
+                    <div class="subsection" id="me-notes">
+                        <div class="subsection-title">Past Meeting Notes</div>
+                        <div class="item-card">
+                            <div class="item-title">NPRC <> Maine PFML</div>
+                            <div class="item-meta">
+                                <span>Maine Paid Family and Medical Leave</span>
+                                <span>Ongoing</span>
+                            </div>
+                            <a href="https://docs.google.com/document/d/1zbvcZwsX33IB2XFzuBxcCnNR6m6BYqOEV8iSICCom7c/edit?tab=t.kqh82zz7iu0s#heading=h.887etagfqt7" target="_blank" class="item-link">View Notes</a>
+                            <a href="https://gustohq.slack.com/archives/C06TREZDFNJ/p1772730976177659" target="_blank" class="item-link">Slack Recap (3/5/26)</a>
+                            <a href="https://mail.google.com/mail/u/0/#inbox/19c8b0bdf7f6e5ec" target="_blank" class="item-link">Agenda Request (2/23/26)</a>
+                            <a href="https://mail.google.com/mail/u/0/#inbox/19cb4228c7ab3918" target="_blank" class="item-link">Agenda Follow-up (3/3/26)</a>
+                        </div>
+                    </div>
+
+                    <div class="subsection">
+                        <div class="subsection-title">Claude Instructions</div>
+                        <div class="instruction-card">
+                            <div class="instruction-header" onclick="toggleInstruction('me-pfml-summary')">
+                                <div class="instruction-title">
+                                    <span class="toggle-icon" id="toggle-me-pfml-summary">▼</span>
+                                    Summarize Maine PFML Meeting for TaCo Team
+                                </div>
+                                <button class="copy-btn" onclick="event.stopPropagation(); copyInstruction('me-pfml-summary', this)">Copy</button>
+                            </div>
+                            <div class="instruction-content" id="instruction-me-pfml-summary">Review the latest NPRC <> Maine PFML meeting notes at https://docs.google.com/document/d/1zbvcZwsX33IB2XFzuBxcCnNR6m6BYqOEV8iSICCom7c/edit?tab=t.kqh82zz7iu0s#heading=h.887etagfqt7
+
+Create a summary for the #taco-team Slack channel highlighting:
+- Any technical requirements or API changes discussed
+- Timeline updates for Maine PFML implementation
+- Questions or concerns from the state agency
+- Gusto-specific action items
+
+Format as a Slack message with clear sections.</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Idaho Section -->
+            <div class="state-section">
+                <div class="state-header" onclick="toggleStateSection(this)">
+                    <div class="state-title">Idaho <span class="collapse-icon">▼</span></div>
+                    <div class="activity-badges">
+                        <a href="#id-notes" class="activity-badge cool">1 Note</a>
+                    </div>
+                </div>
+                <div class="state-content">
+                    <div style="margin-bottom: 20px;">
+                        <span style="color: #6B7785; font-size: 0.9em;">No dedicated Drive folder found</span>
+                    </div>
+                    <div class="subsection" id="id-notes">
+                        <div class="subsection-title">Past Meeting Notes</div>
+                        <div class="item-card">
+                            <div class="item-title">Idaho SUI Discussion Notes</div>
+                            <div class="item-meta">
+                                <span>State Unemployment Insurance</span>
+                                <span>November 14, 2025</span>
+                            </div>
+                            <a href="https://docs.google.com/document/d/1fskdvPhjV25mSgIuT2T0dN9dafYmm_JzLQsSHoTup1o/edit" target="_blank" class="item-link">View Notes</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Other States with No Activity -->
+            <div class="state-section">
+                <div class="state-header" onclick="toggleStateSection(this)">
+                    <div class="state-title">Other Tracked States <span class="collapse-icon">▼</span></div>
+                    <div class="activity-badges">
+                        <a href="#other-notes" class="activity-badge cool">1 Update</a>
+                    </div>
+                </div>
+                <div class="state-content">
+                    <div style="margin-bottom: 20px;">
+                        <a href="https://drive.google.com/drive/folders/1Ac5JYMjG6hmGXM-LGa1CMmCEwqVxeL61" target="_blank" class="item-link">NPRC <> ND SUI Folder</a>
+                    </div>
+                    <div class="subsection" id="other-notes">
+                        <div class="subsection-title">Meeting Notes & Updates</div>
+                        <div class="item-card">
+                            <div class="item-title">North Dakota SUI Portal Modernization</div>
+                            <div class="item-meta">
+                                <span>State Unemployment Insurance</span>
+                                <span>January 2026</span>
+                            </div>
+                            <a href="https://docs.google.com/document/d/1VDcwuqLbO2ev1hK7FAJjGkoyZYYVUoJi6Yq4x6wkYm0/edit?usp=drivesdk" target="_blank" class="item-link">Meeting Notes</a>
+                            <a href="https://gustohq.slack.com/archives/GEYMC0LHK/p1768506702708859" target="_blank" class="item-link">Slack Update (1/15/26)</a>
+                            <a href="https://mail.google.com/mail/u/0/#inbox/19c4ee5d0a73405e" target="_blank" class="item-link">Recap Discussion (2/11/26)</a>
+                        </div>
+                    </div>
+
+                    <div class="empty-state">
+                        <p><strong>Arizona, Pennsylvania, Mississippi, Missouri, Montana, South Dakota, New Hampshire, Georgia</strong></p>
+                        <p>No current meetings or action items scheduled - monitoring for future activity</p>
+                    </div>
+                </div>
+            </div>
+            </div>
+
+            <!-- NPRC Section (in States tab) -->
+            <div class="state-section nprc-section" style="margin-bottom: 30px;">
+                <div class="state-header" onclick="toggleStateSection(this)">
+                    <div class="state-title">NPRC (Multi-State) <span class="collapse-icon">▼</span></div>
+                    <div class="activity-badges">
+                        <a href="#nprc-upcoming" class="activity-badge hot">2 Upcoming</a>
+                        <a href="#nprc-notes" class="activity-badge">8 Notes</a>
+                        <a href="#nprc-actions" class="activity-badge">4 Actions</a>
+                    </div>
+                </div>
+                <div class="state-content">
+                    <div style="margin-bottom: 20px;">
+                        <span style="color: #6B7785; font-size: 0.9em;">NPRC folders organized by state (see state-specific NPRC folders above)</span>
+                    </div>
+                    <div class="subsection" id="nprc-upcoming">
+                        <div class="subsection-title">Upcoming Meetings</div>
+                        <div class="item-card">
+                            <div class="item-title">NPRC Government Relations Manager Monthly Meeting</div>
+                            <div class="item-meta">
+                                <span>April 3, 2026 at 11:00 AM - 12:00 PM EST</span>
+                                <span>Shelly, Erica, Ali, Greg, Lauren + industry partners</span>
+                            </div>
+                            <a href="https://www.google.com/calendar/event?eid=MTBhcnVxYWMzbzd2MWs5cWt0ZWJxbTBybGJfMjAyNjA0MDNUMTYwMDAwWiBsYXVyZW4uZXNjYWxhbnRlQGd1c3RvLmNvbQ" target="_blank" class="item-link">View in Calendar</a>
+                        </div>
+                        <div class="item-card">
+                            <div class="item-title">NPRC State Emerging Issues Monthly Meeting</div>
+                            <div class="item-meta">
+                                <span>April 7, 2026 at 1:30 PM - 3:00 PM EST</span>
+                                <span>Ali, Erica, Greg, Lauren, Shelly + industry compliance partners</span>
+                            </div>
+                            <a href="https://www.google.com/calendar/event?eid=bGJyamRjYmJsYzAyZ2ZxazQ0MjA0bWpidjVfMjAyNjA0MDdUMTgzMDAwWiBsYXVyZW4uZXNjYWxhbnRlQGd1c3RvLmNvbQ" target="_blank" class="item-link">View in Calendar</a>
+                        </div>
+                    </div>
+
+                    <div class="subsection" id="nprc-notes">
+                        <div class="subsection-title">Past Meeting Notes</div>
+                        <div class="item-card">
+                            <div class="item-title">NPRC - PFML Subcommittee</div>
+                            <div class="item-meta">
+                                <span>Ongoing | Multiple State PFML agencies</span>
+                            </div>
+                            <a href="https://docs.google.com/document/d/1zbvcZwsX33IB2XFzuBxcCnNR6m6BYqOEV8iSICCom7c/edit?tab=t.kqh82zz7iu0s#heading=h.887etagfqt7" target="_blank" class="item-link">Meeting Notes</a>
+                        </div>
+                        <div class="item-card">
+                            <div class="item-title">NPRC Authorization Meeting Recaps</div>
+                            <div class="item-meta">
+                                <span>March 23, 2026 | Shelly, Michelle, Kurt + state reps</span>
+                            </div>
+                            <a href="https://docs.google.com/document/d/1KbXZeLGxcz1UFEJo-uimxUPKMb01a_IzyTiWXzMwBVU/edit" target="_blank" class="item-link">All Recaps</a>
+                        </div>
+                        <div class="item-card">
+                            <div class="item-title">NPRC Government Relations Managers - Session Notes</div>
+                            <div class="item-meta">
+                                <span>March 13, 2026 | Monthly meeting</span>
+                            </div>
+                            <a href="https://docs.google.com/document/d/1_ymQyiDiBuV_SrWlsjA8w8MUChW-d83Wga4qA1oSqdM/edit" target="_blank" class="item-link">View Notes</a>
+                        </div>
+                        <div class="item-card">
+                            <div class="item-title">NPRC Monthly Member Notes</div>
+                            <div class="item-meta">
+                                <span>March 11, 2026 | Monthly member meeting</span>
+                            </div>
+                            <a href="https://docs.google.com/document/d/1vqUqm9TYW8t2pH3_G2yWuBXuj60Ni_dvGDMBg4I8OqU/edit" target="_blank" class="item-link">View Notes</a>
+                            <a href="https://mail.google.com/mail/u/0/#inbox/19c8b0cb6e35aa9d" target="_blank" class="item-link">Agenda Request (2/23/26)</a>
+                        </div>
+                        <div class="item-card">
+                            <div class="item-title">Money Transmitter Licensing <> NPRC Monthly Meeting</div>
+                            <div class="item-meta">
+                                <span>November 19, 2025 | NPRC MTL meetings</span>
+                            </div>
+                            <a href="https://docs.google.com/document/d/1YN1KoP_hDxiguiGPEw23Yx_mHkiu2lMKN91Or4TWSvk/edit" target="_blank" class="item-link">View Notes</a>
+                        </div>
+                        <div class="item-card">
+                            <div class="item-title">NPRC Tips/OT Subgroup Meeting Minutes</div>
+                            <div class="item-meta">
+                                <span>September 3, 2025 | OT Tips & Compensation subgroup</span>
+                            </div>
+                            <a href="https://docs.google.com/document/d/1sHjs6u94QMytIp3GS8J3yaAL5Mtv0ZpdcoVGgAIWOx8/edit" target="_blank" class="item-link">View Notes</a>
+                        </div>
+                        <div class="item-card">
+                            <div class="item-title">External Agency Meeting Notes</div>
+                            <div class="item-meta">
+                                <span>March 10, 2026 | 📄 PDF Document</span>
+                            </div>
+                            <a href="https://drive.google.com/file/d/1ycrUdSXtYGkxBpFU8DauPAUvbTB9dJ9G/view" target="_blank" class="item-link">View PDF</a>
+                        </div>
+                        <div class="item-card">
+                            <div class="item-title">Government Affairs Meeting Notes</div>
+                            <div class="item-meta">
+                                <span>Ongoing | Government affairs documentation</span>
+                            </div>
+                            <a href="https://docs.google.com/document/d/1DmLZ_E-3MfQ5ao0Dhn2vfy_bhXR05kwSeY1A5K3tz2Q/edit" target="_blank" class="item-link">View Notes</a>
+                        </div>
+                    </div>
+
+                    <div class="subsection" id="nprc-actions">
+                        <div class="subsection-title">Action Items</div>
+                        <div class="item-card">
+                            <div class="item-title">UI Tax Issues / Employer Sessions</div>
+                            <div class="item-meta">
+                                <span>Status: TODO</span>
+                                <span>Priority: HIGH</span>
+                                <span>Due: Apr 14-16, 2026</span>
+                            </div>
+                        </div>
+                        <div class="item-card">
+                            <div class="item-title">UWC Conference Attendance</div>
+                            <div class="item-meta">
+                                <span>Status: TODO</span>
+                                <span>Priority: HIGH</span>
+                                <span>Due: May 2026</span>
+                            </div>
+                        </div>
+                        <div class="item-card">
+                            <div class="item-title">PFML Fed Guidance Compliance Review</div>
+                            <div class="item-meta">
+                                <span>Status: TODO</span>
+                                <span>Priority: HIGH</span>
+                            </div>
+                        </div>
+                        <div class="item-card">
+                            <div class="item-title">FTA Technology Outreach</div>
+                            <div class="item-meta">
+                                <span>Status: TODO</span>
+                                <span>Priority: MEDIUM</span>
+                                <span>Owner: Shelly</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="subsection">
+                        <div class="subsection-title">Claude Instructions</div>
+                        <div class="instruction-card">
+                            <div class="instruction-header" onclick="toggleInstruction('nprc-member-email')">
+                                <div class="instruction-title">
+                                    <span class="toggle-icon" id="toggle-nprc-member-email">▼</span>
+                                    Draft NPRC Member Update Email
+                                </div>
+                                <button class="copy-btn" onclick="event.stopPropagation(); copyInstruction('nprc-member-email', this)">Copy</button>
+                            </div>
+                            <div class="instruction-content" id="instruction-nprc-member-email">Based on the latest NPRC meeting notes at https://docs.google.com/document/d/1vqUqm9TYW8t2pH3_G2yWuBXuj60Ni_dvGDMBg4I8OqU/edit, draft a professional email update for NPRC members covering:
+
+1. Key regulatory updates discussed
+2. State-specific developments (highlight any hot topics)
+3. Upcoming deadlines or compliance requirements
+4. Industry collaboration opportunities
+5. Next meeting date and agenda preview
+
+Tone: Professional, informative, action-oriented
+Length: 3-4 paragraphs</div>
+                        </div>
+
+                        <div class="instruction-card">
+                            <div class="instruction-header" onclick="toggleInstruction('nprc-action-tracker')">
+                                <div class="instruction-title">
+                                    <span class="toggle-icon" id="toggle-nprc-action-tracker">▼</span>
+                                    Generate Action Item Tracker
+                                </div>
+                                <button class="copy-btn" onclick="event.stopPropagation(); copyInstruction('nprc-action-tracker', this)">Copy</button>
+                            </div>
+                            <div class="instruction-content" id="instruction-nprc-action-tracker">Review all NPRC meeting notes from the past 30 days and create a consolidated action item tracker in a table format with columns:
+
+| Action Item | Owner | Due Date | Status | Priority | Related State/Topic |
+
+Focus on Gusto-owned items or items requiring Gusto input. Mark anything overdue in red.</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            </div>
+            <!-- End States Tab -->
+
+            <!-- Metrics Tab -->
+            <div id="metrics-tab-content" class="tab-content">
+                <h2 style="color: #192532; margin-bottom: 20px;">State Agency Filing Metrics</h2>
+            <div class="state-section">
+                <div class="state-header" onclick="toggleStateSection(this)">
+                    <div class="state-title">Filing Success Rates & Counts <span class="collapse-icon">▼</span></div>
+                    <div class="activity-badges">
+                        <span class="activity-badge cool">TY 2025 Data</span>
+                    </div>
+                </div>
+                <div class="state-content">
+                    <div class="subsection" style="padding: 30px;">
+                        <div class="subsection-title">Filing Success Rates & Employer Counts</div>
+                        <p style="color: #6B7785; margin-bottom: 15px; font-size: 0.95em;">Average filing success rates and successful filing counts for Tax Year 2025 across key state agencies.</p>
+
+                        <table class="metrics-table">
+                            <thead>
+                                <tr>
+                                    <th>State / Agency</th>
+                                    <th>Agency Type</th>
+                                    <th>Filing Success Rate</th>
+                                    <th>Employer Count</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td class="state-col">Nevada - Employment Security Division</td>
+                                    <td>SUI</td>
+                                    <td class="rate-col">75.74%</td>
+                                    <td class="count-col">27,069</td>
+                                </tr>
+                                <tr>
+                                    <td class="state-col">Nevada - Department of Taxation</td>
+                                    <td>MBT</td>
+                                    <td class="rate-col">92.05%</td>
+                                    <td class="count-col">31,425</td>
+                                </tr>
+                                <tr>
+                                    <td class="state-col">Colorado - Department of Revenue</td>
+                                    <td>SIT</td>
+                                    <td class="rate-col">98.96%</td>
+                                    <td class="count-col">49,430</td>
+                                </tr>
+                                <tr>
+                                    <td class="state-col">Colorado - State Treasurer</td>
+                                    <td>SUI</td>
+                                    <td class="rate-col">81.13%</td>
+                                    <td class="count-col">87,859</td>
+                                </tr>
+                                <tr>
+                                    <td class="state-col">Colorado - FAMLI</td>
+                                    <td>PFML</td>
+                                    <td class="rate-col">84.85%</td>
+                                    <td class="count-col">79,036</td>
+                                </tr>
+                                <tr>
+                                    <td class="state-col">Arizona - Withholding</td>
+                                    <td>SIT</td>
+                                    <td class="rate-col">99.98%</td>
+                                    <td class="count-col">115,395</td>
+                                </tr>
+                                <tr>
+                                    <td class="state-col">Arizona - Unemployment</td>
+                                    <td>SUI</td>
+                                    <td class="rate-col">92.13%</td>
+                                    <td class="count-col">28,878</td>
+                                </tr>
+                                <tr>
+                                    <td class="state-col">Maine - Revenue Services</td>
+                                    <td>SIT</td>
+                                    <td class="rate-col">82.77%</td>
+                                    <td class="count-col">12,780</td>
+                                </tr>
+                                <tr>
+                                    <td class="state-col">Maine - Department of Labor</td>
+                                    <td>SUI</td>
+                                    <td class="rate-col">84.64%</td>
+                                    <td class="count-col">9,474</td>
+                                </tr>
+                                <tr>
+                                    <td class="state-col">Maine - PFML</td>
+                                    <td>PFML</td>
+                                    <td class="rate-col">96.27%</td>
+                                    <td class="count-col">9,746</td>
+                                </tr>
+                                <tr>
+                                    <td class="state-col">Georgia - Department of Labor</td>
+                                    <td>SUI</td>
+                                    <td class="rate-col">84.75%</td>
+                                    <td class="count-col">50,277</td>
+                                </tr>
+                                <tr>
+                                    <td class="state-col">Georgia - Department of Revenue</td>
+                                    <td>SIT</td>
+                                    <td class="rate-col">94.67%</td>
+                                    <td class="count-col">121,644</td>
+                                </tr>
+                                <tr>
+                                    <td class="state-col">North Dakota - Job Service</td>
+                                    <td>SUI</td>
+                                    <td class="rate-col">96.01%</td>
+                                    <td class="count-col">3,864</td>
+                                </tr>
+                                <tr>
+                                    <td class="state-col">Idaho - State Tax Commission</td>
+                                    <td>SIT</td>
+                                    <td class="rate-col">89.91%</td>
+                                    <td class="count-col">48,636</td>
+                                </tr>
+                                <tr>
+                                    <td class="state-col">Idaho - DOL</td>
+                                    <td>SUI</td>
+                                    <td class="rate-col">84.92%</td>
+                                    <td class="count-col">37,194</td>
+                                </tr>
+                                <tr>
+                                    <td class="state-col">Montana - Unemployment Insurance Division</td>
+                                    <td>SUI</td>
+                                    <td class="rate-col">84.91%</td>
+                                    <td class="count-col">11,130</td>
+                                </tr>
+                                <tr>
+                                    <td class="state-col">Missouri - Department of Revenue</td>
+                                    <td>SIT</td>
+                                    <td class="rate-col">96.86%</td>
+                                    <td class="count-col">30,049</td>
+                                </tr>
+                                <tr>
+                                    <td class="state-col">Missouri - Dept. of Labor</td>
+                                    <td>SUI</td>
+                                    <td class="rate-col">82.44%</td>
+                                    <td class="count-col">29,202</td>
+                                </tr>
+                                <tr>
+                                    <td class="state-col">Mississippi - Department of Revenue</td>
+                                    <td>SIT</td>
+                                    <td class="rate-col">86.46%</td>
+                                    <td class="count-col">2,768</td>
+                                </tr>
+                                <tr>
+                                    <td class="state-col">Mississippi - Department of Employment Security</td>
+                                    <td>SUI</td>
+                                    <td class="rate-col">65.95%</td>
+                                    <td class="count-col">5,807</td>
+                                </tr>
+                                <tr>
+                                    <td class="state-col">South Dakota - Reemployment Assistance</td>
+                                    <td>SUI</td>
+                                    <td class="rate-col">92.59%</td>
+                                    <td class="count-col">4,863</td>
+                                </tr>
+                                <tr>
+                                    <td class="state-col">West Virginia - State Tax Department</td>
+                                    <td>SIT</td>
+                                    <td class="rate-col">92.22%</td>
+                                    <td class="count-col">8,700</td>
+                                </tr>
+                                <tr>
+                                    <td class="state-col">West Virginia - Unemployment Compensation Division</td>
+                                    <td>SUI</td>
+                                    <td class="rate-col">69.49%</td>
+                                    <td class="count-col">8,357</td>
+                                </tr>
+                                <tr>
+                                    <td class="state-col">New Mexico - Taxation and Revenue Dept</td>
+                                    <td>SIT</td>
+                                    <td class="rate-col">88.06%</td>
+                                    <td class="count-col">8,044</td>
+                                </tr>
+                                <tr>
+                                    <td class="state-col">New Mexico - Dept of Workforce Solutions</td>
+                                    <td>SUI</td>
+                                    <td class="rate-col">79.40%</td>
+                                    <td class="count-col">11,120</td>
+                                </tr>
+                            </tbody>
+                        </table>
+
+                        <div style="margin-top: 20px; padding: 15px; background: linear-gradient(135deg, rgba(10, 128, 128, 0.03) 0%, rgba(10, 128, 128, 0.06) 100%); border-radius: 8px; border-left: 4px solid #0A8080;">
+                            <p style="color: #6B7785; font-size: 0.9em; line-height: 1.6;"><strong>Data Source:</strong> Y2025-Raw filing success rates from <a href="https://docs.google.com/spreadsheets/d/1KytnD9NsLVIyoDH62By2UfQtx7Oxf8Ltk8ltLpoPLsw/edit?gid=1154919784" target="_blank" style="color: #0A8080; text-decoration: underline;">TY 2025 Filing Success Rates</a>. Metrics represent Grand Total averages across all quarters (Q1-Q4 2025).</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Reference Section -->
+            <div class="state-section" style="margin-bottom: 0;">
+                <div class="state-header" onclick="toggleStateSection(this)">
+                    <div class="state-title">Resources & Trackers <span class="collapse-icon">▼</span></div>
+                    <div class="activity-badges">
+                        <span class="activity-badge cool">Reference</span>
+                    </div>
+                </div>
+                <div class="state-content">
+                    <div class="item-card">
+                        <div class="item-title">Industry Call Coordination Tracker</div>
+                        <div class="item-meta">
+                            <span>📊 Live tracking spreadsheet for all industry and agency calls</span>
+                        </div>
+                        <a href="https://docs.google.com/spreadsheets/d/1_XBy7CTNrWuYss7BSWZwj5xQhKwuem_pao5B1r2FumE/edit" target="_blank" class="item-link">View Tracker</a>
+                    </div>
+                </div>
+            </div>
+            </div>
+            <!-- End Metrics Tab -->
+
         </div>
     </div>
 
     <script>
-        function loadState() {
-            const todos = JSON.parse(localStorage.getItem('todoStates')) || {};
-            for (let id in todos) {
-                const state = todos[id];
-                const item = document.querySelector(`[data-id="${id}"]`);
-                const statusSelect = document.getElementById(`status-${id}`);
-                const statusBadge = document.getElementById(`status-badge-${id}`);
+        // Live clock and update tracking
+        let pageLoadTime = new Date();
+        let autoRefreshInterval = 5; // minutes
+        let autoRefreshTimer = null;
 
-                if (state.status) {
-                    if (statusSelect) statusSelect.value = state.status;
-                    if (statusBadge) {
-                        statusBadge.textContent = state.status.replace('_', ' ');
-                        statusBadge.className = 'status-badge ' + state.status.toLowerCase().replace('_', '-');
+        // Tab switching
+        function switchTab(tabName) {
+            // Hide all tab contents
+            document.querySelectorAll('.tab-content').forEach(content => {
+                content.classList.remove('active');
+            });
+
+            // Remove active class from all tab buttons
+            document.querySelectorAll('.tab-button').forEach(button => {
+                button.classList.remove('active');
+            });
+
+            // Show selected tab content
+            const tabMap = {
+                'overview': 'overview-tab',
+                'reminders': 'reminders-tab-content',
+                'states': 'states-tab-content',
+                'actions': 'actions-tab-content',
+                'metrics': 'metrics-tab-content'
+            };
+
+            const contentId = tabMap[tabName];
+            if (contentId) {
+                document.getElementById(contentId).classList.add('active');
+            }
+
+            // Set active button
+            event.target.closest('.tab-button').classList.add('active');
+        }
+
+        // Toggle state sections
+        function toggleStateSection(headerElement) {
+            const stateSection = headerElement.closest('.state-section');
+            const content = stateSection.querySelector('.state-content');
+            const icon = headerElement.querySelector('.collapse-icon');
+
+            if (content.classList.contains('expanded')) {
+                content.classList.remove('expanded');
+                if (icon) icon.classList.remove('rotated');
+            } else {
+                content.classList.add('expanded');
+                if (icon) icon.classList.add('rotated');
+            }
+        }
+
+        // Action item checkbox handling with localStorage
+        function toggleActionItem(checkbox, itemId) {
+            const item = checkbox.closest('.checkbox-item');
+            const checkedItems = JSON.parse(localStorage.getItem('checkedActions') || '[]');
+
+            if (checkbox.checked) {
+                item.classList.add('checked');
+                if (!checkedItems.includes(itemId)) {
+                    checkedItems.push(itemId);
+                }
+
+                // Hide after animation
+                setTimeout(() => {
+                    item.style.display = 'none';
+                    updateActionCount();
+                }, 300);
+            } else {
+                item.classList.remove('checked');
+                item.style.display = 'flex';
+                const index = checkedItems.indexOf(itemId);
+                if (index > -1) {
+                    checkedItems.splice(index, 1);
+                }
+            }
+
+            localStorage.setItem('checkedActions', JSON.stringify(checkedItems));
+            updateActionCount();
+        }
+
+        // Update action item count
+        function updateActionCount() {
+            const visibleActions = document.querySelectorAll('.action-item:not([style*="display: none"])').length;
+            const countElement = document.getElementById('actions-count');
+            const totalElement = document.getElementById('total-actions');
+
+            if (countElement) countElement.textContent = visibleActions;
+            if (totalElement) totalElement.textContent = visibleActions;
+        }
+
+        // Filter actions
+        function filterActions(filterType) {
+            const actions = document.querySelectorAll('.action-item');
+
+            // Update active filter button
+            document.querySelectorAll('.filter-button').forEach(btn => {
+                btn.classList.remove('active');
+            });
+            event.target.classList.add('active');
+
+            actions.forEach(action => {
+                const priority = action.dataset.priority;
+                const isChecked = action.style.display === 'none';
+
+                if (isChecked) return; // Don't show checked items
+
+                if (filterType === 'all') {
+                    action.style.display = 'flex';
+                } else if (filterType === 'high' && priority === 'high') {
+                    action.style.display = 'flex';
+                } else if (filterType === 'medium' && priority === 'medium') {
+                    action.style.display = 'flex';
+                } else if (filterType === 'todo') {
+                    action.style.display = 'flex';
+                } else {
+                    action.style.display = 'none';
+                }
+            });
+        }
+
+        // Restore checked state from localStorage
+        function restoreCheckedState() {
+            const checkedItems = JSON.parse(localStorage.getItem('checkedActions') || '[]');
+
+            checkedItems.forEach(itemId => {
+                const item = document.querySelector(`[data-id="${itemId}"]`);
+                if (item) {
+                    const checkbox = item.querySelector('input[type="checkbox"]');
+                    if (checkbox) {
+                        checkbox.checked = true;
+                        item.classList.add('checked');
+                        item.style.display = 'none';
                     }
                 }
+            });
 
-                if (state.completed && item) {
-                    item.classList.add('completed');
-                }
-            }
+            updateActionCount();
         }
 
-        function saveState(id, updates) {
-            const todos = JSON.parse(localStorage.getItem('todoStates')) || {};
-            todos[id] = { ...todos[id], ...updates };
-            localStorage.setItem('todoStates', JSON.stringify(todos));
+        function updateLiveClock() {
+            const now = new Date();
+            const options = {
+                weekday: 'short',
+                year: 'numeric',
+                month: 'short',
+                day: 'numeric',
+                hour: '2-digit',
+                minute: '2-digit',
+                second: '2-digit',
+                timeZoneName: 'short'
+            };
+            document.getElementById('live-clock').textContent = now.toLocaleString('en-US', options);
         }
 
-        function toggleTodo(id) {
-            const details = document.getElementById(`details-${id}`);
-            const icon = document.getElementById(`expand-${id}`);
+        function updateLastRefreshed() {
+            const now = new Date();
+            const diffMs = now - pageLoadTime;
+            const diffSecs = Math.floor(diffMs / 1000);
+            const diffMins = Math.floor(diffSecs / 60);
+            const diffHours = Math.floor(diffMins / 60);
 
-            if (details.classList.contains('expanded')) {
-                details.classList.remove('expanded');
-                icon.classList.remove('expanded');
+            let timeText;
+            if (diffSecs < 60) {
+                timeText = diffSecs === 0 ? 'Just now' : `${diffSecs} second${diffSecs !== 1 ? 's' : ''} ago`;
+            } else if (diffMins < 60) {
+                timeText = `${diffMins} minute${diffMins !== 1 ? 's' : ''} ago`;
             } else {
-                details.classList.add('expanded');
-                icon.classList.add('expanded');
+                timeText = `${diffHours} hour${diffHours !== 1 ? 's' : ''} ago`;
             }
+
+            document.getElementById('last-updated').textContent = timeText;
         }
 
-        function updateStatus(id) {
-            const select = document.getElementById(`status-${id}`);
-            const badge = document.getElementById(`status-badge-${id}`);
-            const status = select.value;
+        function refreshDashboard() {
+            // Show refreshing state
+            const statusIndicator = document.getElementById('status-indicator');
+            statusIndicator.style.background = '#FFA726';
 
-            badge.textContent = status.replace('_', ' ');
-            badge.className = 'status-badge ' + status.toLowerCase().replace('_', '-');
-
-            saveState(id, { status: status });
-            showNotification(`Status updated to: ${status.replace('_', ' ')}`);
-        }
-
-        function markComplete(id) {
-            const item = document.querySelector(`[data-id="${id}"]`);
-            const select = document.getElementById(`status-${id}`);
-            const badge = document.getElementById(`status-badge-${id}`);
-
-            item.classList.add('completed');
-            select.value = 'DONE';
-            badge.textContent = 'DONE';
-            badge.className = 'status-badge done';
-
-            saveState(id, { status: 'DONE', completed: true });
-            showNotification('Task marked as complete!');
-        }
-
-        function showNotification(message) {
-            const notification = document.createElement('div');
-            notification.style.cssText = `
-                position: fixed;
-                top: 20px;
-                right: 20px;
-                background: #28a745;
-                color: white;
-                padding: 15px 25px;
-                border-radius: 8px;
-                box-shadow: 0 4px 12px rgba(0,0,0,0.2);
-                z-index: 1000;
-                animation: slideIn 0.3s ease;
-            `;
-            notification.textContent = message;
-            document.body.appendChild(notification);
-
+            // In a real implementation, this would fetch new data from APIs
+            // For now, we'll just reload the page
             setTimeout(() => {
-                notification.style.animation = 'slideOut 0.3s ease';
-                setTimeout(() => notification.remove(), 300);
-            }, 2000);
+                window.location.reload();
+            }, 500);
         }
 
-        const style = document.createElement('style');
-        style.textContent = `
-            @keyframes slideIn {
-                from { transform: translateX(400px); opacity: 0; }
-                to { transform: translateX(0); opacity: 1; }
+        function startAutoRefresh() {
+            // Clear any existing timer
+            if (autoRefreshTimer) {
+                clearInterval(autoRefreshTimer);
             }
-            @keyframes slideOut {
-                from { transform: translateX(0); opacity: 1; }
-                to { transform: translateX(400px); opacity: 0; }
-            }
-        `;
-        document.head.appendChild(style);
 
-        window.addEventListener('DOMContentLoaded', loadState);
+            // Set up new timer (convert minutes to milliseconds)
+            autoRefreshTimer = setInterval(() => {
+                console.log('Auto-refreshing dashboard...');
+                refreshDashboard();
+            }, autoRefreshInterval * 60 * 1000);
+        }
+
+        function manualRefresh() {
+            refreshDashboard();
+        }
+
+        // Update clock every second
+        setInterval(updateLiveClock, 1000);
+
+        // Update "last refreshed" every second
+        setInterval(updateLastRefreshed, 1000);
+
+        // Meeting reminder functionality
+        function addMeetingReminders() {
+            const now = new Date();
+            const twoWeeksFromNow = new Date(now.getTime() + (14 * 24 * 60 * 60 * 1000));
+
+            // Define meetings with their dates and reminder types
+            const meetings = [
+                {
+                    selector: 'a[href*="napeo-upcoming"]',
+                    name: 'NAPEO State Government Affairs Committee',
+                    date: new Date('2026-03-26T14:00:00'),
+                    type: 'email',
+                    label: '📧 Send Agenda Request',
+                    recipients: 'NAPEO members + industry partners'
+                },
+                {
+                    selector: 'a[href*="nv-upcoming"]',
+                    name: 'NV SUI Filing Success Rate Focus Discussion',
+                    date: new Date('2026-03-26T09:00:00'),
+                    type: 'slack',
+                    label: '💬 Post Slack Reminder',
+                    recipients: 'Internal team'
+                },
+                {
+                    selector: 'a[href*="co-upcoming"]',
+                    name: 'NPRC <> CO DOR June Quarterly Meeting',
+                    date: new Date('2026-06-10T11:00:00'),
+                    type: 'email',
+                    label: '📧 Send Agenda Request',
+                    recipients: 'Marc Maes, Aaron Gonzales + industry partners'
+                },
+                {
+                    selector: 'a[href*="me-upcoming"]',
+                    name: 'NPRC <> Maine PFML June Quarterly Meeting',
+                    date: new Date('2026-06-03T11:00:00'),
+                    type: 'email',
+                    label: '📧 Send Agenda Request',
+                    recipients: "Luke O'Monahan, Reginald Parson + industry partners"
+                },
+                {
+                    selector: 'a[href*="nprc-upcoming"]',
+                    name: 'NPRC Government Relations Manager Monthly Meeting',
+                    date: new Date('2026-04-03T11:00:00'),
+                    type: 'slack',
+                    label: '💬 Post Slack Reminder',
+                    recipients: 'Internal team'
+                }
+            ];
+
+            const upcomingReminders = [];
+
+            meetings.forEach(meeting => {
+                const daysUntilMeeting = Math.ceil((meeting.date - now) / (1000 * 60 * 60 * 24));
+
+                // Show reminder if meeting is 14 days away or less (but still in future)
+                if (daysUntilMeeting <= 14 && daysUntilMeeting >= 0) {
+                    upcomingReminders.push({
+                        ...meeting,
+                        daysUntil: daysUntilMeeting
+                    });
+
+                    const targetElement = document.querySelector(meeting.selector);
+                    if (targetElement) {
+                        const parentSection = targetElement.closest('.subsection');
+                        if (parentSection) {
+                            const meetingCards = parentSection.querySelectorAll('.item-card');
+                            meetingCards.forEach(card => {
+                                // Check if reminder already exists
+                                if (!card.querySelector('.reminder-badge')) {
+                                    const reminderBadge = document.createElement('span');
+                                    reminderBadge.className = `reminder-badge ${meeting.type}-reminder`;
+                                    reminderBadge.textContent = `${meeting.label} (${daysUntilMeeting} days)`;
+
+                                    const itemMeta = card.querySelector('.item-meta');
+                                    if (itemMeta) {
+                                        itemMeta.appendChild(reminderBadge);
+                                    }
+                                }
+                            });
+                        }
+                    }
+                }
+            });
+
+            // Populate reminder summary
+            const reminderSummary = document.getElementById('reminder-summary');
+            const reminderList = document.getElementById('reminder-list');
+            const noReminders = document.getElementById('no-reminders');
+            const reminderCountBadge = document.getElementById('reminders-count');
+            const urgentRemindersCount = document.getElementById('urgent-reminders');
+
+            if (upcomingReminders.length > 0) {
+                reminderSummary.style.display = 'block';
+                if (noReminders) noReminders.style.display = 'none';
+                reminderList.innerHTML = '';
+
+                upcomingReminders.sort((a, b) => a.daysUntil - b.daysUntil);
+
+                const urgentCount = upcomingReminders.filter(r => r.daysUntil <= 7).length;
+                if (reminderCountBadge) reminderCountBadge.textContent = upcomingReminders.length;
+                if (urgentRemindersCount) urgentRemindersCount.textContent = urgentCount;
+
+                upcomingReminders.forEach(reminder => {
+                    const reminderItem = document.createElement('div');
+                    reminderItem.className = 'item-card';
+                    reminderItem.style.cssText = 'border-left: 4px solid ' + (reminder.daysUntil <= 7 ? '#F45D48' : '#FFA726');
+
+                    reminderItem.innerHTML = `
+                        <div style="display: flex; justify-content: space-between; align-items: flex-start; gap: 20px;">
+                            <div style="flex: 1;">
+                                <div style="font-weight: 600; color: #192532; margin-bottom: 8px; font-size: 1.1em;">${reminder.name}</div>
+                                <div style="font-size: 0.9em; color: #6B7785; margin-bottom: 8px;">
+                                    ${reminder.type === 'email' ? '📧 Email agenda request to: ' : '💬 Post Slack reminder for: '} ${reminder.recipients}
+                                </div>
+                                <div style="display: inline-block; padding: 4px 12px; background: ${reminder.type === 'email' ? '#FFA726' : '#4A154B'}; color: white; border-radius: 6px; font-size: 0.85em; font-weight: 600;">
+                                    ${reminder.label}
+                                </div>
+                            </div>
+                            <div style="text-align: right; min-width: 60px;">
+                                <div style="font-size: 2em; font-weight: 600; color: ${reminder.daysUntil <= 7 ? '#F45D48' : '#FFA726'};">${reminder.daysUntil}</div>
+                                <div style="font-size: 0.85em; color: #6B7785; font-weight: 500;">days away</div>
+                            </div>
+                        </div>
+                    `;
+
+                    reminderList.appendChild(reminderItem);
+                });
+            } else {
+                reminderSummary.style.display = 'none';
+                if (noReminders) noReminders.style.display = 'block';
+                if (reminderCountBadge) reminderCountBadge.textContent = '0';
+                if (urgentRemindersCount) urgentRemindersCount.textContent = '0';
+            }
+        }
+
+        // Initialize on page load
+        window.addEventListener('DOMContentLoaded', () => {
+            updateLiveClock();
+            updateLastRefreshed();
+            startAutoRefresh();
+            addMeetingReminders();
+            restoreCheckedState();
+
+            // Auto-expand sections with upcoming meetings
+            const upcomingSections = document.querySelectorAll('a[href*="-upcoming"]');
+            upcomingSections.forEach(link => {
+                const stateSection = link.closest('.state-section');
+                if (stateSection) {
+                    const content = stateSection.querySelector('.state-content');
+                    const icon = stateSection.querySelector('.collapse-icon');
+                    if (content) {
+                        content.classList.add('expanded');
+                        if (icon) icon.classList.add('rotated');
+                    }
+                }
+            });
+        });
+
+        function toggleInstruction(id) {
+            const content = document.getElementById(`instruction-${id}`);
+            const icon = document.getElementById(`toggle-${id}`);
+            content.classList.toggle('expanded');
+            icon.classList.toggle('rotated');
+        }
+
+        function copyInstruction(id, button) {
+            const content = document.getElementById(`instruction-${id}`).textContent;
+            navigator.clipboard.writeText(content).then(() => {
+                button.textContent = 'Copied!';
+                button.classList.add('copied');
+                setTimeout(() => {
+                    button.textContent = 'Copy';
+                    button.classList.remove('copied');
+                }, 2000);
+            });
+        }
+
     </script>
 </body>
 </html>
