@@ -658,6 +658,191 @@
                 font-size: 0.85em;
             }
         }
+
+        /* US Heat Map Styles */
+        .map-container {
+            background: white;
+            border-radius: 16px;
+            padding: 40px;
+            box-shadow: 0 4px 16px rgba(25, 37, 50, 0.08);
+            margin: 30px 0;
+        }
+
+        .map-header {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        .map-title {
+            font-size: 1.8em;
+            color: #192532;
+            margin-bottom: 10px;
+            font-weight: 600;
+        }
+
+        .map-subtitle {
+            color: #6B7785;
+            font-size: 1em;
+        }
+
+        .us-map {
+            max-width: 1000px;
+            margin: 0 auto;
+            position: relative;
+        }
+
+        .us-map svg {
+            width: 100%;
+            height: auto;
+        }
+
+        .state-path {
+            fill: #E5E8EB;
+            stroke: white;
+            stroke-width: 1.5;
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+
+        .state-path:hover {
+            fill: #0A8080;
+            transform: scale(1.02);
+            filter: drop-shadow(0 4px 8px rgba(10, 128, 128, 0.3));
+        }
+
+        .state-path.active {
+            fill: #0D9999;
+        }
+
+        .state-path.high-activity {
+            fill: #4CAF50;
+        }
+
+        .state-path.medium-activity {
+            fill: #FFC107;
+        }
+
+        .state-path.low-activity {
+            fill: #F45D48;
+        }
+
+        .map-tooltip {
+            position: absolute;
+            background: rgba(25, 37, 50, 0.95);
+            color: white;
+            padding: 15px 20px;
+            border-radius: 12px;
+            pointer-events: none;
+            opacity: 0;
+            transition: opacity 0.2s;
+            z-index: 1000;
+            min-width: 250px;
+            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.3);
+        }
+
+        .map-tooltip.show {
+            opacity: 1;
+        }
+
+        .tooltip-state {
+            font-size: 1.3em;
+            font-weight: 700;
+            margin-bottom: 12px;
+            border-bottom: 2px solid rgba(255, 255, 255, 0.2);
+            padding-bottom: 8px;
+        }
+
+        .tooltip-metric {
+            display: flex;
+            justify-content: space-between;
+            margin: 8px 0;
+            font-size: 0.95em;
+        }
+
+        .tooltip-label {
+            opacity: 0.8;
+        }
+
+        .tooltip-value {
+            font-weight: 600;
+        }
+
+        .map-legend {
+            display: flex;
+            justify-content: center;
+            gap: 30px;
+            margin-top: 30px;
+            flex-wrap: wrap;
+        }
+
+        .legend-item {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .legend-color {
+            width: 30px;
+            height: 20px;
+            border-radius: 4px;
+            border: 1px solid #E5E8EB;
+        }
+
+        .legend-label {
+            font-size: 0.9em;
+            color: #6B7785;
+        }
+
+        .state-box {
+            background: #E5E8EB;
+            border: 2px solid white;
+            border-radius: 6px;
+            padding: 15px 10px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            min-height: 50px;
+        }
+
+        .state-box:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 6px 16px rgba(10, 128, 128, 0.3);
+            z-index: 10;
+        }
+
+        .state-box.high-activity {
+            background: #4CAF50;
+            color: white;
+        }
+
+        .state-box.medium-activity {
+            background: #FFC107;
+            color: #333;
+        }
+
+        .state-box.low-activity {
+            background: #F45D48;
+            color: white;
+        }
+
+        @media (max-width: 768px) {
+            .map-container {
+                padding: 20px;
+            }
+
+            .us-map > div {
+                grid-template-columns: repeat(6, 1fr) !important;
+            }
+
+            .state-box {
+                padding: 10px 5px;
+                min-height: 40px;
+                font-size: 0.8em;
+            }
+        }
     </style>
 </head>
 <body>
@@ -718,6 +903,195 @@
                     <div class="stat-card">
                         <span class="stat-number" id="total-actions">6</span>
                         <div class="stat-label">Action Items</div>
+                    </div>
+                </div>
+
+                <!-- US Heat Map -->
+                <div class="map-container">
+                    <div class="map-header">
+                        <h2 class="map-title">State Activity Heat Map</h2>
+                        <p class="map-subtitle">Hover over states to see detailed metrics</p>
+                    </div>
+
+                    <div class="us-map" id="us-map">
+                        <!-- Simplified US Map Grid for Prototype -->
+                        <div style="display: grid; grid-template-columns: repeat(12, 1fr); gap: 8px; max-width: 900px; margin: 0 auto;">
+                            <!-- Row 1 - Northern States -->
+                            <div style="grid-column: 1 / 3;"></div>
+                            <div class="state-box medium-activity" data-state="MT" style="grid-column: 3 / 5;">
+                                <span style="font-size: 0.8em; font-weight: 600;">MT</span>
+                            </div>
+                            <div class="state-box" data-state="ND" style="grid-column: 5 / 6;">
+                                <span style="font-size: 0.8em; font-weight: 600;">ND</span>
+                            </div>
+                            <div class="state-box" data-state="MN" style="grid-column: 6 / 7;">
+                                <span style="font-size: 0.8em; font-weight: 600;">MN</span>
+                            </div>
+                            <div style="grid-column: 7 / 8;"></div>
+                            <div class="state-box" data-state="WI" style="grid-column: 8 / 9;">
+                                <span style="font-size: 0.8em; font-weight: 600;">WI</span>
+                            </div>
+                            <div style="grid-column: 9 / 10;"></div>
+                            <div class="state-box" data-state="MI" style="grid-column: 10 / 11;">
+                                <span style="font-size: 0.8em; font-weight: 600;">MI</span>
+                            </div>
+
+                            <!-- Row 2 -->
+                            <div class="state-box" data-state="WA" style="grid-column: 1 / 3;">
+                                <span style="font-size: 0.8em; font-weight: 600;">WA</span>
+                            </div>
+                            <div class="state-box high-activity" data-state="ID" style="grid-column: 3 / 4;">
+                                <span style="font-size: 0.8em; font-weight: 600;">ID</span>
+                            </div>
+                            <div class="state-box" data-state="WY" style="grid-column: 4 / 5;">
+                                <span style="font-size: 0.8em; font-weight: 600;">WY</span>
+                            </div>
+                            <div class="state-box" data-state="SD" style="grid-column: 5 / 6;">
+                                <span style="font-size: 0.8em; font-weight: 600;">SD</span>
+                            </div>
+                            <div class="state-box" data-state="IA" style="grid-column: 6 / 7;">
+                                <span style="font-size: 0.8em; font-weight: 600;">IA</span>
+                            </div>
+                            <div class="state-box" data-state="IL" style="grid-column: 7 / 8;">
+                                <span style="font-size: 0.8em; font-weight: 600;">IL</span>
+                            </div>
+                            <div class="state-box" data-state="IN" style="grid-column: 8 / 9;">
+                                <span style="font-size: 0.8em; font-weight: 600;">IN</span>
+                            </div>
+                            <div class="state-box" data-state="OH" style="grid-column: 9 / 10;">
+                                <span style="font-size: 0.8em; font-weight: 600;">OH</span>
+                            </div>
+                            <div class="state-box" data-state="PA" style="grid-column: 10 / 11;">
+                                <span style="font-size: 0.8em; font-weight: 600;">PA</span>
+                            </div>
+                            <div class="state-box" data-state="NY" style="grid-column: 11 / 13;">
+                                <span style="font-size: 0.8em; font-weight: 600;">NY</span>
+                            </div>
+
+                            <!-- Row 3 -->
+                            <div class="state-box" data-state="OR" style="grid-column: 1 / 3;">
+                                <span style="font-size: 0.8em; font-weight: 600;">OR</span>
+                            </div>
+                            <div class="state-box high-activity" data-state="NV" style="grid-column: 3 / 4;">
+                                <span style="font-size: 0.8em; font-weight: 600;">NV</span>
+                            </div>
+                            <div class="state-box" data-state="UT" style="grid-column: 4 / 5;">
+                                <span style="font-size: 0.8em; font-weight: 600;">UT</span>
+                            </div>
+                            <div class="state-box high-activity" data-state="CO" style="grid-column: 5 / 6;">
+                                <span style="font-size: 0.8em; font-weight: 600;">CO</span>
+                            </div>
+                            <div class="state-box" data-state="NE" style="grid-column: 6 / 7;">
+                                <span style="font-size: 0.8em; font-weight: 600;">NE</span>
+                            </div>
+                            <div class="state-box" data-state="MO" style="grid-column: 7 / 8;">
+                                <span style="font-size: 0.8em; font-weight: 600;">MO</span>
+                            </div>
+                            <div class="state-box" data-state="KY" style="grid-column: 8 / 9;">
+                                <span style="font-size: 0.8em; font-weight: 600;">KY</span>
+                            </div>
+                            <div class="state-box" data-state="WV" style="grid-column: 9 / 10;">
+                                <span style="font-size: 0.8em; font-weight: 600;">WV</span>
+                            </div>
+                            <div class="state-box" data-state="VA" style="grid-column: 10 / 11;">
+                                <span style="font-size: 0.8em; font-weight: 600;">VA</span>
+                            </div>
+                            <div class="state-box" data-state="MD" style="grid-column: 11 / 12;">
+                                <span style="font-size: 0.8em; font-weight: 600;">MD</span>
+                            </div>
+
+                            <!-- Row 4 -->
+                            <div class="state-box" data-state="CA" style="grid-column: 1 / 3;">
+                                <span style="font-size: 0.8em; font-weight: 600;">CA</span>
+                            </div>
+                            <div class="state-box" data-state="AZ" style="grid-column: 3 / 4;">
+                                <span style="font-size: 0.8em; font-weight: 600;">AZ</span>
+                            </div>
+                            <div class="state-box" data-state="NM" style="grid-column: 4 / 5;">
+                                <span style="font-size: 0.8em; font-weight: 600;">NM</span>
+                            </div>
+                            <div class="state-box" data-state="KS" style="grid-column: 5 / 6;">
+                                <span style="font-size: 0.8em; font-weight: 600;">KS</span>
+                            </div>
+                            <div class="state-box" data-state="AR" style="grid-column: 6 / 7;">
+                                <span style="font-size: 0.8em; font-weight: 600;">AR</span>
+                            </div>
+                            <div class="state-box" data-state="TN" style="grid-column: 7 / 8;">
+                                <span style="font-size: 0.8em; font-weight: 600;">TN</span>
+                            </div>
+                            <div class="state-box" data-state="NC" style="grid-column: 8 / 9;">
+                                <span style="font-size: 0.8em; font-weight: 600;">NC</span>
+                            </div>
+                            <div class="state-box" data-state="SC" style="grid-column: 9 / 10;">
+                                <span style="font-size: 0.8em; font-weight: 600;">SC</span>
+                            </div>
+
+                            <!-- Row 5 -->
+                            <div style="grid-column: 1 / 4;"></div>
+                            <div class="state-box" data-state="OK" style="grid-column: 4 / 5;">
+                                <span style="font-size: 0.8em; font-weight: 600;">OK</span>
+                            </div>
+                            <div class="state-box" data-state="LA" style="grid-column: 5 / 6;">
+                                <span style="font-size: 0.8em; font-weight: 600;">LA</span>
+                            </div>
+                            <div class="state-box" data-state="MS" style="grid-column: 6 / 7;">
+                                <span style="font-size: 0.8em; font-weight: 600;">MS</span>
+                            </div>
+                            <div class="state-box" data-state="AL" style="grid-column: 7 / 8;">
+                                <span style="font-size: 0.8em; font-weight: 600;">AL</span>
+                            </div>
+                            <div class="state-box" data-state="GA" style="grid-column: 8 / 9;">
+                                <span style="font-size: 0.8em; font-weight: 600;">GA</span>
+                            </div>
+                            <div class="state-box low-activity" data-state="FL" style="grid-column: 9 / 11;">
+                                <span style="font-size: 0.8em; font-weight: 600;">FL</span>
+                            </div>
+
+                            <!-- Row 6 - Texas -->
+                            <div style="grid-column: 1 / 4;"></div>
+                            <div class="state-box medium-activity" data-state="TX" style="grid-column: 4 / 7;">
+                                <span style="font-size: 0.8em; font-weight: 600;">TX</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="map-tooltip" id="map-tooltip">
+                        <div class="tooltip-state" id="tooltip-state"></div>
+                        <div class="tooltip-metric">
+                            <span class="tooltip-label">Filing Rate:</span>
+                            <span class="tooltip-value" id="tooltip-filing"></span>
+                        </div>
+                        <div class="tooltip-metric">
+                            <span class="tooltip-label">ER Count:</span>
+                            <span class="tooltip-value" id="tooltip-er"></span>
+                        </div>
+                        <div class="tooltip-metric">
+                            <span class="tooltip-label">Meetings:</span>
+                            <span class="tooltip-value" id="tooltip-meetings"></span>
+                        </div>
+                        <div class="tooltip-metric">
+                            <span class="tooltip-label">Last Contact:</span>
+                            <span class="tooltip-value" id="tooltip-contact"></span>
+                        </div>
+                    </div>
+
+                    <div class="map-legend">
+                        <div class="legend-item">
+                            <div class="legend-color" style="background: #4CAF50;"></div>
+                            <div class="legend-label">High Activity / Good Health</div>
+                        </div>
+                        <div class="legend-item">
+                            <div class="legend-color" style="background: #FFC107;"></div>
+                            <div class="legend-label">Medium Activity</div>
+                        </div>
+                        <div class="legend-item">
+                            <div class="legend-color" style="background: #F45D48;"></div>
+                            <div class="legend-label">Needs Attention</div>
+                        </div>
+                        <div class="legend-item">
+                            <div class="legend-color" style="background: #E5E8EB;"></div>
+                            <div class="legend-label">No Data</div>
+                        </div>
                     </div>
                 </div>
 
@@ -2242,6 +2616,81 @@ Focus on Gusto-owned items or items requiring Gusto input. Mark anything overdue
                 });
             }
         });
+
+        // US Heat Map Data and Interactions
+        const stateData = {
+            'CO': { name: 'Colorado', filingRate: '98.5%', erCount: '12,450', meetings: '3 upcoming', lastContact: 'Mar 11, 2026' },
+            'NV': { name: 'Nevada', filingRate: '97.2%', erCount: '8,230', meetings: '1 upcoming', lastContact: 'Mar 16, 2026' },
+            'ID': { name: 'Idaho', filingRate: '96.8%', erCount: '5,120', meetings: '0', lastContact: 'Nov 14, 2025' },
+            'TX': { name: 'Texas', filingRate: '94.5%', erCount: '18,340', meetings: '1 upcoming', lastContact: 'Feb 15, 2026' },
+            'MT': { name: 'Montana', filingRate: '95.1%', erCount: '3,890', meetings: '0', lastContact: 'Jan 20, 2026' },
+            'FL': { name: 'Florida', filingRate: '89.2%', erCount: '15,670', meetings: '0', lastContact: 'Jan 15, 2026' },
+            'CA': { name: 'California', filingRate: '92.3%', erCount: '25,890', meetings: '0', lastContact: 'Feb 10, 2026' },
+            'NY': { name: 'New York', filingRate: '93.7%', erCount: '19,230', meetings: '0', lastContact: 'Jan 28, 2026' },
+            'WA': { name: 'Washington', filingRate: '96.1%', erCount: '9,450', meetings: '0', lastContact: 'Feb 20, 2026' },
+            'OR': { name: 'Oregon', filingRate: '95.8%', erCount: '6,780', meetings: '0', lastContact: 'Feb 18, 2026' },
+            'AZ': { name: 'Arizona', filingRate: '94.2%', erCount: '8,950', meetings: '0', lastContact: 'Feb 12, 2026' },
+            'IL': { name: 'Illinois', filingRate: '93.9%', erCount: '14,560', meetings: '0', lastContact: 'Feb 8, 2026' },
+            'MA': { name: 'Massachusetts', filingRate: '95.4%', erCount: '10,230', meetings: '0', lastContact: 'Feb 22, 2026' },
+            'PA': { name: 'Pennsylvania', filingRate: '94.6%', erCount: '12,780', meetings: '0', lastContact: 'Feb 5, 2026' }
+        };
+
+        function initializeHeatMap() {
+            const stateBoxes = document.querySelectorAll('.state-box');
+            const tooltip = document.getElementById('map-tooltip');
+
+            stateBoxes.forEach(box => {
+                const stateCode = box.getAttribute('data-state');
+                const data = stateData[stateCode];
+
+                if (data) {
+                    box.addEventListener('mouseenter', (e) => {
+                        // Update tooltip content
+                        document.getElementById('tooltip-state').textContent = data.name;
+                        document.getElementById('tooltip-filing').textContent = data.filingRate;
+                        document.getElementById('tooltip-er').textContent = data.erCount;
+                        document.getElementById('tooltip-meetings').textContent = data.meetings;
+                        document.getElementById('tooltip-contact').textContent = data.lastContact;
+
+                        // Show tooltip
+                        tooltip.classList.add('show');
+                    });
+
+                    box.addEventListener('mousemove', (e) => {
+                        // Position tooltip near cursor
+                        tooltip.style.left = e.pageX + 20 + 'px';
+                        tooltip.style.top = e.pageY - 80 + 'px';
+                    });
+
+                    box.addEventListener('mouseleave', () => {
+                        tooltip.classList.remove('show');
+                    });
+                } else {
+                    // States without data
+                    box.addEventListener('mouseenter', (e) => {
+                        document.getElementById('tooltip-state').textContent = stateCode;
+                        document.getElementById('tooltip-filing').textContent = 'No data';
+                        document.getElementById('tooltip-er').textContent = 'No data';
+                        document.getElementById('tooltip-meetings').textContent = 'No data';
+                        document.getElementById('tooltip-contact').textContent = 'No data';
+
+                        tooltip.classList.add('show');
+                    });
+
+                    box.addEventListener('mousemove', (e) => {
+                        tooltip.style.left = e.pageX + 20 + 'px';
+                        tooltip.style.top = e.pageY - 80 + 'px';
+                    });
+
+                    box.addEventListener('mouseleave', () => {
+                        tooltip.classList.remove('show');
+                    });
+                }
+            });
+        }
+
+        // Initialize heat map when page loads
+        window.addEventListener('DOMContentLoaded', initializeHeatMap);
 
     </script>
 </body>
