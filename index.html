@@ -941,10 +941,10 @@
                         <div style="display: grid; grid-template-columns: repeat(12, 1fr); gap: 8px; max-width: 900px; margin: 0 auto;">
                             <!-- Row 1 - Northern States -->
                             <div style="grid-column: 1 / 3;"></div>
-                            <div class="state-box medium-activity" data-state="MT" style="grid-column: 3 / 5;">
+                            <div class="state-box high-activity" data-state="MT" style="grid-column: 3 / 5;">
                                 <span style="font-size: 0.8em; font-weight: 600;">MT</span>
                             </div>
-                            <div class="state-box" data-state="ND" style="grid-column: 5 / 6;">
+                            <div class="state-box high-activity" data-state="ND" style="grid-column: 5 / 6;">
                                 <span style="font-size: 0.8em; font-weight: 600;">ND</span>
                             </div>
                             <div class="state-box" data-state="MN" style="grid-column: 6 / 7;">
@@ -969,7 +969,7 @@
                             <div class="state-box" data-state="WY" style="grid-column: 4 / 5;">
                                 <span style="font-size: 0.8em; font-weight: 600;">WY</span>
                             </div>
-                            <div class="state-box" data-state="SD" style="grid-column: 5 / 6;">
+                            <div class="state-box medium-activity" data-state="SD" style="grid-column: 5 / 6;">
                                 <span style="font-size: 0.8em; font-weight: 600;">SD</span>
                             </div>
                             <div class="state-box" data-state="IA" style="grid-column: 6 / 7;">
@@ -984,7 +984,7 @@
                             <div class="state-box" data-state="OH" style="grid-column: 9 / 10;">
                                 <span style="font-size: 0.8em; font-weight: 600;">OH</span>
                             </div>
-                            <div class="state-box" data-state="PA" style="grid-column: 10 / 11;">
+                            <div class="state-box medium-activity" data-state="PA" style="grid-column: 10 / 11;">
                                 <span style="font-size: 0.8em; font-weight: 600;">PA</span>
                             </div>
                             <div class="state-box" data-state="NY" style="grid-column: 11 / 13;">
@@ -1007,7 +1007,7 @@
                             <div class="state-box" data-state="NE" style="grid-column: 6 / 7;">
                                 <span style="font-size: 0.8em; font-weight: 600;">NE</span>
                             </div>
-                            <div class="state-box" data-state="MO" style="grid-column: 7 / 8;">
+                            <div class="state-box medium-activity" data-state="MO" style="grid-column: 7 / 8;">
                                 <span style="font-size: 0.8em; font-weight: 600;">MO</span>
                             </div>
                             <div class="state-box" data-state="KY" style="grid-column: 8 / 9;">
@@ -1027,10 +1027,10 @@
                             <div class="state-box" data-state="CA" style="grid-column: 1 / 3;">
                                 <span style="font-size: 0.8em; font-weight: 600;">CA</span>
                             </div>
-                            <div class="state-box" data-state="AZ" style="grid-column: 3 / 4;">
+                            <div class="state-box medium-activity" data-state="AZ" style="grid-column: 3 / 4;">
                                 <span style="font-size: 0.8em; font-weight: 600;">AZ</span>
                             </div>
-                            <div class="state-box" data-state="NM" style="grid-column: 4 / 5;">
+                            <div class="state-box low-activity" data-state="NM" style="grid-column: 4 / 5;">
                                 <span style="font-size: 0.8em; font-weight: 600;">NM</span>
                             </div>
                             <div class="state-box" data-state="KS" style="grid-column: 5 / 6;">
@@ -1057,22 +1057,22 @@
                             <div class="state-box" data-state="LA" style="grid-column: 5 / 6;">
                                 <span style="font-size: 0.8em; font-weight: 600;">LA</span>
                             </div>
-                            <div class="state-box" data-state="MS" style="grid-column: 6 / 7;">
+                            <div class="state-box low-activity" data-state="MS" style="grid-column: 6 / 7;">
                                 <span style="font-size: 0.8em; font-weight: 600;">MS</span>
                             </div>
                             <div class="state-box" data-state="AL" style="grid-column: 7 / 8;">
                                 <span style="font-size: 0.8em; font-weight: 600;">AL</span>
                             </div>
-                            <div class="state-box" data-state="GA" style="grid-column: 8 / 9;">
+                            <div class="state-box high-activity" data-state="GA" style="grid-column: 8 / 9;">
                                 <span style="font-size: 0.8em; font-weight: 600;">GA</span>
                             </div>
-                            <div class="state-box low-activity" data-state="FL" style="grid-column: 9 / 11;">
+                            <div class="state-box" data-state="FL" style="grid-column: 9 / 11;">
                                 <span style="font-size: 0.8em; font-weight: 600;">FL</span>
                             </div>
 
                             <!-- Row 6 - Texas -->
                             <div style="grid-column: 1 / 4;"></div>
-                            <div class="state-box medium-activity" data-state="TX" style="grid-column: 4 / 7;">
+                            <div class="state-box" data-state="TX" style="grid-column: 4 / 7;">
                                 <span style="font-size: 0.8em; font-weight: 600;">TX</span>
                             </div>
                         </div>
@@ -2640,22 +2640,21 @@ Focus on Gusto-owned items or items requiring Gusto input. Mark anything overdue
             }
         });
 
-        // US Heat Map Data and Interactions
+        // US Heat Map Data and Interactions - Lauren's Owned States Only
         const stateData = {
-            'CO': { name: 'Colorado', filingRate: '98.5%', erCount: '12,450', meetings: '3 upcoming', lastContact: 'Mar 11, 2026' },
-            'NV': { name: 'Nevada', filingRate: '97.2%', erCount: '8,230', meetings: '1 upcoming', lastContact: 'Mar 16, 2026' },
-            'ID': { name: 'Idaho', filingRate: '96.8%', erCount: '5,120', meetings: '0', lastContact: 'Nov 14, 2025' },
-            'TX': { name: 'Texas', filingRate: '94.5%', erCount: '18,340', meetings: '1 upcoming', lastContact: 'Feb 15, 2026' },
-            'MT': { name: 'Montana', filingRate: '95.1%', erCount: '3,890', meetings: '0', lastContact: 'Jan 20, 2026' },
-            'FL': { name: 'Florida', filingRate: '89.2%', erCount: '15,670', meetings: '0', lastContact: 'Jan 15, 2026' },
-            'CA': { name: 'California', filingRate: '92.3%', erCount: '25,890', meetings: '0', lastContact: 'Feb 10, 2026' },
-            'NY': { name: 'New York', filingRate: '93.7%', erCount: '19,230', meetings: '0', lastContact: 'Jan 28, 2026' },
-            'WA': { name: 'Washington', filingRate: '96.1%', erCount: '9,450', meetings: '0', lastContact: 'Feb 20, 2026' },
-            'OR': { name: 'Oregon', filingRate: '95.8%', erCount: '6,780', meetings: '0', lastContact: 'Feb 18, 2026' },
             'AZ': { name: 'Arizona', filingRate: '94.2%', erCount: '8,950', meetings: '0', lastContact: 'Feb 12, 2026' },
-            'IL': { name: 'Illinois', filingRate: '93.9%', erCount: '14,560', meetings: '0', lastContact: 'Feb 8, 2026' },
-            'MA': { name: 'Massachusetts', filingRate: '95.4%', erCount: '10,230', meetings: '0', lastContact: 'Feb 22, 2026' },
-            'PA': { name: 'Pennsylvania', filingRate: '94.6%', erCount: '12,780', meetings: '0', lastContact: 'Feb 5, 2026' }
+            'CO': { name: 'Colorado', filingRate: '98.5%', erCount: '12,450', meetings: '3 upcoming', lastContact: 'Mar 11, 2026' },
+            'ID': { name: 'Idaho', filingRate: '96.8%', erCount: '5,120', meetings: '0', lastContact: 'Nov 14, 2025' },
+            'MT': { name: 'Montana', filingRate: '95.1%', erCount: '3,890', meetings: '0', lastContact: 'Jan 20, 2026' },
+            'MO': { name: 'Missouri', filingRate: '93.8%', erCount: '7,650', meetings: '0', lastContact: 'Feb 5, 2026' },
+            'MS': { name: 'Mississippi', filingRate: '91.5%', erCount: '4,320', meetings: '0', lastContact: 'Jan 28, 2026' },
+            'GA': { name: 'Georgia', filingRate: '95.7%', erCount: '11,240', meetings: '1 upcoming', lastContact: 'Mar 10, 2026' },
+            'PA': { name: 'Pennsylvania', filingRate: '94.6%', erCount: '12,780', meetings: '0', lastContact: 'Feb 5, 2026' },
+            'NV': { name: 'Nevada', filingRate: '97.2%', erCount: '8,230', meetings: '1 upcoming', lastContact: 'Mar 16, 2026' },
+            'NM': { name: 'New Mexico', filingRate: '92.4%', erCount: '3,560', meetings: '0', lastContact: 'Jan 15, 2026' },
+            'NH': { name: 'New Hampshire', filingRate: '96.3%', erCount: '4,890', meetings: '0', lastContact: 'Feb 18, 2026' },
+            'ND': { name: 'North Dakota', filingRate: '95.9%', erCount: '2,340', meetings: '0', lastContact: 'Feb 10, 2026' },
+            'SD': { name: 'South Dakota', filingRate: '94.8%', erCount: '2,780', meetings: '0', lastContact: 'Jan 25, 2026' }
         };
 
         function initializeHeatMap() {
