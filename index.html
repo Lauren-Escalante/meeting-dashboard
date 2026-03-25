@@ -688,6 +688,9 @@
             <button class="tab-button" onclick="switchTab('metrics')">
                 📈 Metrics
             </button>
+            <button class="tab-button" onclick="switchTab('personal')">
+                🔒 Personal
+            </button>
         </div>
 
         <div class="content">
@@ -1595,6 +1598,55 @@ Focus on Gusto-owned items or items requiring Gusto input. Mark anything overdue
             </div>
             <!-- End Metrics Tab -->
 
+            <!-- Personal Tab (Private - Browser Only) -->
+            <div id="personal-tab" class="tab-content">
+                <div class="section">
+                    <h2 class="section-title">🔒 Personal Notes & Schedule (Private)</h2>
+                    <p style="color: #6B7785; margin-bottom: 30px; font-style: italic;">
+                        This content is stored only in your browser and never uploaded to the public dashboard.
+                    </p>
+
+                    <!-- Personal To-Do Notes -->
+                    <div style="margin-bottom: 50px;">
+                        <h3 style="font-size: 1.4em; color: #0A8080; margin-bottom: 20px;">📝 Personal To-Do Notes</h3>
+
+                        <div style="margin-bottom: 20px;">
+                            <input type="text" id="personal-note-input" placeholder="Add a personal note..."
+                                style="width: 70%; padding: 12px; border: 2px solid #E5E8EB; border-radius: 8px; font-size: 1em; margin-right: 10px;">
+                            <button onclick="addPersonalNote()"
+                                style="padding: 12px 24px; background: #0A8080; color: white; border: none; border-radius: 8px; cursor: pointer; font-weight: 600; font-size: 1em;">
+                                + Add Note
+                            </button>
+                        </div>
+
+                        <div id="personal-notes-list" style="display: grid; gap: 15px;">
+                            <!-- Personal notes will be inserted here -->
+                        </div>
+                    </div>
+
+                    <!-- Days Off Tracker -->
+                    <div>
+                        <h3 style="font-size: 1.4em; color: #0A8080; margin-bottom: 20px;">🏖️ Scheduled Days Off</h3>
+
+                        <div style="margin-bottom: 20px;">
+                            <input type="date" id="day-off-date"
+                                style="padding: 12px; border: 2px solid #E5E8EB; border-radius: 8px; font-size: 1em; margin-right: 10px;">
+                            <input type="text" id="day-off-reason" placeholder="Reason (e.g., Vacation, PTO)"
+                                style="width: 30%; padding: 12px; border: 2px solid #E5E8EB; border-radius: 8px; font-size: 1em; margin-right: 10px;">
+                            <button onclick="addDayOff()"
+                                style="padding: 12px 24px; background: #F45D48; color: white; border: none; border-radius: 8px; cursor: pointer; font-weight: 600; font-size: 1em;">
+                                + Add Day Off
+                            </button>
+                        </div>
+
+                        <div id="days-off-list" style="display: grid; gap: 15px;">
+                            <!-- Days off will be inserted here -->
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <!-- End Personal Tab -->
+
         </div>
     </div>
 
@@ -1982,6 +2034,189 @@ Focus on Gusto-owned items or items requiring Gusto input. Mark anything overdue
                 }, 2000);
             });
         }
+
+        // Personal Data Management (Browser-Only Storage)
+        function loadPersonalNotes() {
+            return JSON.parse(localStorage.getItem('personalNotes') || '[]');
+        }
+
+        function savePersonalNotes(notes) {
+            localStorage.setItem('personalNotes', JSON.stringify(notes));
+        }
+
+        function loadDaysOff() {
+            return JSON.parse(localStorage.getItem('daysOff') || '[]');
+        }
+
+        function saveDaysOff(days) {
+            localStorage.setItem('daysOff', JSON.stringify(days));
+        }
+
+        function addPersonalNote() {
+            const input = document.getElementById('personal-note-input');
+            const noteText = input.value.trim();
+
+            if (!noteText) return;
+
+            const notes = loadPersonalNotes();
+            notes.push({
+                id: Date.now(),
+                text: noteText,
+                createdAt: new Date().toISOString(),
+                completed: false
+            });
+
+            savePersonalNotes(notes);
+            renderPersonalNotes();
+            input.value = '';
+        }
+
+        function deletePersonalNote(id) {
+            const notes = loadPersonalNotes().filter(note => note.id !== id);
+            savePersonalNotes(notes);
+            renderPersonalNotes();
+        }
+
+        function togglePersonalNote(id) {
+            const notes = loadPersonalNotes();
+            const note = notes.find(n => n.id === id);
+            if (note) {
+                note.completed = !note.completed;
+                savePersonalNotes(notes);
+                renderPersonalNotes();
+            }
+        }
+
+        function renderPersonalNotes() {
+            const container = document.getElementById('personal-notes-list');
+            const notes = loadPersonalNotes();
+
+            if (notes.length === 0) {
+                container.innerHTML = '<p style="color: #6B7785; font-style: italic;">No personal notes yet. Add one above!</p>';
+                return;
+            }
+
+            container.innerHTML = notes.map(note => `
+                <div style="background: ${note.completed ? '#FAFBFC' : 'white'}; padding: 20px; border-radius: 12px; border: 1px solid #E5E8EB; box-shadow: 0 2px 8px rgba(25, 37, 50, 0.06); display: flex; align-items: center; justify-content: space-between;">
+                    <div style="display: flex; align-items: center; gap: 15px; flex: 1;">
+                        <input type="checkbox" ${note.completed ? 'checked' : ''}
+                            onchange="togglePersonalNote(${note.id})"
+                            style="width: 20px; height: 20px; cursor: pointer;">
+                        <span style="flex: 1; ${note.completed ? 'text-decoration: line-through; color: #6B7785;' : 'color: #192532;'} font-size: 1.1em;">
+                            ${note.text}
+                        </span>
+                    </div>
+                    <button onclick="deletePersonalNote(${note.id})"
+                        style="padding: 8px 16px; background: #F45D48; color: white; border: none; border-radius: 6px; cursor: pointer; font-weight: 600;">
+                        Delete
+                    </button>
+                </div>
+            `).join('');
+        }
+
+        function addDayOff() {
+            const dateInput = document.getElementById('day-off-date');
+            const reasonInput = document.getElementById('day-off-reason');
+
+            const date = dateInput.value;
+            const reason = reasonInput.value.trim() || 'PTO';
+
+            if (!date) {
+                alert('Please select a date');
+                return;
+            }
+
+            const daysOff = loadDaysOff();
+            daysOff.push({
+                id: Date.now(),
+                date: date,
+                reason: reason
+            });
+
+            daysOff.sort((a, b) => new Date(a.date) - new Date(b.date));
+            saveDaysOff(daysOff);
+            renderDaysOffCalendar();
+
+            dateInput.value = '';
+            reasonInput.value = '';
+        }
+
+        function deleteDayOff(id) {
+            const daysOff = loadDaysOff().filter(day => day.id !== id);
+            saveDaysOff(daysOff);
+            renderDaysOffCalendar();
+        }
+
+        function renderDaysOffCalendar() {
+            const container = document.getElementById('days-off-list');
+            const daysOff = loadDaysOff();
+
+            if (daysOff.length === 0) {
+                container.innerHTML = '<p style="color: #6B7785; font-style: italic;">No days off scheduled. Add one above!</p>';
+                return;
+            }
+
+            // Group days off by month
+            const grouped = {};
+            daysOff.forEach(day => {
+                const date = new Date(day.date);
+                const monthKey = `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}`;
+                if (!grouped[monthKey]) grouped[monthKey] = [];
+                grouped[monthKey].push(day);
+            });
+
+            container.innerHTML = Object.keys(grouped).sort().map(monthKey => {
+                const [year, month] = monthKey.split('-');
+                const monthName = new Date(year, parseInt(month) - 1).toLocaleDateString('en-US', { month: 'long', year: 'numeric' });
+
+                return `
+                    <div style="margin-bottom: 30px;">
+                        <h4 style="color: #0A8080; margin-bottom: 15px; font-size: 1.2em;">${monthName}</h4>
+                        <div style="display: grid; gap: 10px;">
+                            ${grouped[monthKey].map(day => {
+                                const date = new Date(day.date);
+                                const dayName = date.toLocaleDateString('en-US', { weekday: 'long' });
+                                const dateStr = date.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
+                                const isPast = date < new Date();
+
+                                return `
+                                    <div style="background: ${isPast ? '#F5F5F5' : 'linear-gradient(135deg, #F45D48 0%, #FF7E68 100%)'}; color: ${isPast ? '#6B7785' : 'white'}; padding: 15px 20px; border-radius: 10px; display: flex; justify-content: space-between; align-items: center; box-shadow: 0 2px 8px rgba(0,0,0,0.1);">
+                                        <div>
+                                            <div style="font-weight: 700; font-size: 1.1em;">${dateStr} - ${dayName}</div>
+                                            <div style="opacity: 0.9; margin-top: 5px;">${day.reason}</div>
+                                        </div>
+                                        <button onclick="deleteDayOff(${day.id})"
+                                            style="padding: 8px 16px; background: rgba(255,255,255,${isPast ? '0.5' : '0.2'}); color: ${isPast ? '#6B7785' : 'white'}; border: 1px solid ${isPast ? '#C4CDD5' : 'rgba(255,255,255,0.3)'}; border-radius: 6px; cursor: pointer; font-weight: 600;">
+                                            Remove
+                                        </button>
+                                    </div>
+                                `;
+                            }).join('')}
+                        </div>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        // Initialize personal data when switching to personal tab
+        const originalSwitchTab = switchTab;
+        switchTab = function(tabName) {
+            originalSwitchTab(tabName);
+            if (tabName === 'personal') {
+                renderPersonalNotes();
+                renderDaysOffCalendar();
+            }
+        };
+
+        // Allow Enter key to add notes
+        document.addEventListener('DOMContentLoaded', () => {
+            const noteInput = document.getElementById('personal-note-input');
+            if (noteInput) {
+                noteInput.addEventListener('keypress', (e) => {
+                    if (e.key === 'Enter') addPersonalNote();
+                });
+            }
+        });
 
     </script>
 </body>
