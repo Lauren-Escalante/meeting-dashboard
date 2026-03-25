@@ -454,22 +454,22 @@
         /* Tab Navigation */
         .tab-navigation {
             display: flex;
-            gap: 0;
+            gap: 12px;
             background: #FAFBFC;
-            padding: 0 40px;
+            padding: 20px 40px;
             border-bottom: 2px solid #E5E8EB;
             overflow-x: auto;
         }
 
         .tab-button {
-            padding: 18px 28px;
-            background: none;
+            padding: 14px 24px;
+            background: #E5E8EB;
             border: none;
             color: #6B7785;
             font-size: 0.95em;
             font-weight: 600;
             cursor: pointer;
-            border-bottom: 3px solid transparent;
+            border-radius: 8px;
             transition: all 0.2s;
             white-space: nowrap;
             position: relative;
@@ -477,25 +477,33 @@
 
         .tab-button:hover {
             color: #192532;
-            background: rgba(10, 128, 128, 0.05);
+            background: #D3D7DC;
+            transform: translateY(-2px);
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
         }
 
         .tab-button.active {
-            color: #0A8080;
-            border-bottom-color: #0A8080;
-            background: white;
+            color: white;
+            background: #0A8080;
+            box-shadow: 0 4px 12px rgba(10, 128, 128, 0.3);
         }
 
         .tab-button .badge {
             display: inline-block;
             background: #F45D48;
             color: white;
-            padding: 2px 6px;
-            border-radius: 10px;
+            padding: 3px 8px;
+            border-radius: 12px;
             font-size: 0.75em;
-            margin-left: 6px;
-            min-width: 18px;
+            margin-left: 8px;
+            min-width: 20px;
             text-align: center;
+            font-weight: 700;
+        }
+
+        .tab-button.active .badge {
+            background: rgba(255, 255, 255, 0.3);
+            color: white;
         }
 
         .tab-content {
